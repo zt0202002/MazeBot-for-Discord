@@ -1,3 +1,4 @@
 .env
 UserPlaylist
 ServerHistory
+__pycache__
