@@ -35,4 +35,4 @@ async def server_status(ctx, bot):
     # print(f"The server has the following players online: {', '.join(query.players.names)}")
 
     embedVar = discord.Embed(title="Minecraft Server Status", description=f"{output}", color=0xD0B8A0)
-    msg.edit(embed = embedVar)
+    await msg.edit(embed = embedVar)
