@@ -23,7 +23,7 @@ from help_functions.help_queue import *
 from datetime import datetime
 
 from commands import messages, test_slash, cmd_join, cmd_play, cmd_search, cmd_queue, cmd_current, cmd_delete
-from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random
+from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random, cmd_minecraft
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -111,6 +111,9 @@ async def loading(ctx, *, action: Literal['Server History', 'Mine']):
     if action == 'Server History':  await cmd_loading.loading_queue(ctx, action, bot)
     elif action == 'Mine':  await cmd_loading.loading_queue(ctx, action, bot)
     else:  await ctx.send(embed = embedVar)
+
+@bot.hybrid_command(with_app_command=True, name = 'minecraft', description=dp.minecraft) #guild specific slash command
+async def minecraft(ctx): await cmd_minecraft.server_status(ctx, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'save', description=dp.save) #guild specific slash command
 async def saving(ctx, *, url: str): await cmd_loading.save_url_to_file(ctx, url, bot)
