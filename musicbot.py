@@ -23,7 +23,7 @@ from help_functions.help_queue import *
 from datetime import datetime
 
 from commands import messages, test_slash, cmd_join, cmd_play, cmd_search, cmd_queue, cmd_current, cmd_delete
-from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading
+from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -102,9 +102,12 @@ async def maze(ctx):    await ctx.send("http://mazecharm.notion.site")
 @bot.hybrid_command(with_app_command=True, name = 'report', description=dp.report) #guild specific slash command
 async def report(ctx, message: str):    await cmd_report.report(ctx, message, bot)
 
+@bot.hybrid_command(with_app_command=True, name = 'random', description=dp.help) #guild specific slash command
+async def random(ctx):  await cmd_random.random(ctx, bot)
+
 @bot.hybrid_command(with_app_command=True, name = 'load', description=dp.loading) #guild specific slash command
 async def loading(ctx, *, action: Literal['Server History', 'Mine']):
-    embedVar = discord.Embed(title="个人音乐及历史记录功能正在开发中...", description="Please wait...", color=0x00ff00)
+    embedVar = discord.Embed(title="现在就两个功能捏...", description="Please wait...", color=0x00ff00)
     if action == 'Server History':  await cmd_loading.loading_queue(ctx, action, bot)
     elif action == 'Mine':  await cmd_loading.loading_queue(ctx, action, bot)
     else:  await ctx.send(embed = embedVar)
