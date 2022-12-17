@@ -1,0 +1,3 @@
+[2022-12-16 06:59:38.167456] MazeCharmZzt#2964 reported: bug
+[2022-12-16 06:59:43.411405] MazeCharmZzt#2964 reported: bugbug
+[2022-12-17 18:09:28.536546] MazeCharmZzt#2964 reported: History should install [web url] rather than the downloadable link.
