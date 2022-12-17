@@ -102,7 +102,7 @@ async def maze(ctx):    await ctx.send("http://mazecharm.notion.site")
 @bot.hybrid_command(with_app_command=True, name = 'report', description=dp.report) #guild specific slash command
 async def report(ctx, message: str):    await cmd_report.report(ctx, message, bot)
 
-@bot.hybrid_command(with_app_command=True, name = 'random', description=dp.help) #guild specific slash command
+@bot.hybrid_command(with_app_command=True, name = 'random', description=dp.random) #guild specific slash command
 async def random(ctx):  await cmd_random.random(ctx, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'load', description=dp.loading) #guild specific slash command
