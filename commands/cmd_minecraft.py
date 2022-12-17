@@ -22,7 +22,8 @@ async def server_status(ctx, bot):
     if status:
         output = f"The server has {status.players.online} player(s) online and replied in {status.latency} ms\n"
         query = server.query()
-        output += f"The server has the following players online: {'\n'.join(query.players.names)}"
+        if (status.players.online != 0):
+            output += f"The server has the following players online: {', '.join(query.players.names)}"
     else:
         output = "The server is offline"
     # 'ping' is supported by all Minecraft servers that are version 1.7 or higher.
