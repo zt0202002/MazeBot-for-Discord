@@ -16,6 +16,7 @@
 
 ---
 
+
 ### December 16, 2022
 
 - 规划整理了下当前的代码文件，将各个function写入单独的python文件中。
@@ -43,17 +44,17 @@
 # 当前功能
 
 ---
+| Command   | Description  |  Command   | Description  |
+| -------   | -----------  | -------   | -----------  |
+| `play`    | 暂停歌曲      |  `load Server History` | 当bot离开时，保存当前未播放完成的歌单，并下次回来后输入`/load Server History` 即可播放之前未完成播放的歌单。 |
+| `pause`   | 暂停歌曲      |   `load Mine` | 加载自己保存的歌单 |
+| `skip`    | 跳过当前歌曲  |   `save [url]` | 保存链接中的歌单 |
+| `skipto`  | 跳到指定歌曲  |   `report` | 报告错误给马子 |
+| `skipall` | 跳过所有歌曲  |   `maze` | 获取马子的profile |
+| `delete`  | 删除指定歌曲  |   `queue` | 显示当前歌单 |
+| `current` | 显示当前歌曲  |   `current` | 显示当前歌曲 |
+| `leave`   | 让bot离开频道 |   `search` | 搜索歌曲 |
 
-- [x]  `Play`
-    - [x]  播放Bilibili, Youtube
-- [x]  `Pause`
-- [x]  `Skip`
-- [x]  `Skipto`
-- [x]  `Delete`
-- [x]  `Current`
-- [x]  `Leave`
-    - [x]  当频道空无一人时，bot自动离开频道
-- [x]  `loading Server History`当bot离开时，保存当前未播放完成的歌单，并下次回来后继续播放
 
 # 待改进的功能
 
@@ -75,17 +76,14 @@
 
 ---
 
-- [ ]  skipall
+- [ ]  `Repeat` 重复当前歌曲
 - [ ]  …
 
 # 后续功能
 
 ---
 
-- [ ]  `Repeat` 重复当前歌曲
 - [ ]  ChatGPT
-- [ ]  保存未播放完成的歌单
-- [ ]  创建自己的歌单
 - [ ]  支持Spotify
 - [ ]  …
 
