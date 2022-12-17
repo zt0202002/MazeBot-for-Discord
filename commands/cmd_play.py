@@ -27,7 +27,10 @@ async def play(ctx, url, bot):
                 await msg.edit(content='', embed=embedVar)
             else:
                 await addToQueue(ctx.guild, info)
-                embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{len(song_queue[ctx.guild.id]) + 1}]\t{info["title"]}\n{info["webpage_url"]}', color=0x8B4C39)
+                temp_len = len(song_queue[ctx.guild.id])
+                if temp_len == 0: temp_len = 1
+                else: temp_len += 2
+                embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{temp_len}]\t{info["title"]}\n{info["webpage_url"]}', color=0x8B4C39)
                 await msg.edit(content='', embed=embedVar)
         else:
             await addToQueue(ctx.guild, info, ctx)
