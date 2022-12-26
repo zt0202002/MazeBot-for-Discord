@@ -26,3 +26,4 @@ str_not_song_playing = discord.Embed(title=f'我没有要播放的歌了捏！',
 str_exceds_songs = discord.Embed(title=f'我没有那么多歌播放捏！', description='', color=0x487B60)
 str_no_song_next = discord.Embed(title=f'接下来我没有要播放的歌了捏！', description='', color=0x487B60)
 str_not_playlist = discord.Embed(title=f'这不是一个播放列表捏！', description='', color=0x487B60)
+str_invalid_url = discord.Embed(title=f'这不是一个有效的链接捏！', description='', color=0x487B60)

@@ -1,7 +1,11 @@
 .env
-UserPlaylist
-ServerHistory
+*.json
+*.pyc
 __pycache__
 report.txt
 *.txt
-*.json
+*.mp3
+*.wav
+test.py
+.empty
+/QueueLog/**/*.json

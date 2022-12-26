@@ -118,10 +118,15 @@ async def minecraft(ctx): await cmd_minecraft.server_status(ctx, bot)
 @bot.hybrid_command(with_app_command=True, name = 'save', description=dp.save) #guild specific slash command
 async def saving(ctx, *, url: str): await cmd_loading.save_url_to_file(ctx, url, bot)
 
+@bot.hybrid_command(with_app_command=True, name = 'tts', description=dp.tts) #guild specific slash command
+async def on_tts(ctx, *, text: str): 
+    messages.on_tts = not messages.on_tts 
+    await ctx.send("开启嘴替功能！")
+
 @bot.hybrid_command(with_app_command=True, name = 'clear', description=dp.clear) #guild specific slash command
 # @commands.has_permissions(administrator=True)
 async def clear(ctx, amount: int): 
     await ctx.send("Clearing...")
     await ctx.channel.purge(limit=amount + 1)
 
-bot.run(os.getenv('TOKEN'))
+bot.run(os.getenv('TOKEN2'))

@@ -33,7 +33,7 @@ async def skipto(ctx, index, bot):
                 song_queue[ctx.guild.id].pop(0)
             info = song_queue[ctx.guild.id][0]
             voice.stop()
-            embedVar = discord.Embed(title=f'我来播放这首歌了捏', description=f'{info["title"]}\n{info["webpage_url"]}', color=0x8B4C39)
+            embedVar = discord.Embed(title=f'我来播放这首歌了捏', description=f'{info.title}\n{info.watch_url}', color=0x8B4C39)
             await msg.edit(content='', embed=embedVar)
     else:
         await msg.edit(content='', embed=str_not_song_playing)
@@ -47,7 +47,7 @@ async def skip(ctx, bot):
             await ctx.send(embed=str_no_song_next)
         elif len(song_queue[ctx.guild.id]) != 0:
             info = song_queue[ctx.guild.id][0]
-            embedVar = discord.Embed(title=f'我来播放这首歌了捏！', description=f'{info["title"]}\n{info["webpage_url"]}', color=0x8B4C39)
+            embedVar = discord.Embed(title=f'我来播放这首歌了捏！', description=f'{info.title}\n{info.watch_url}', color=0x8B4C39)
             await ctx.send(embed=embedVar)
         else:
             await ctx.send(embed=str_no_song_next)

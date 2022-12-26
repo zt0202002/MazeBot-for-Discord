@@ -1,4 +1,10 @@
 import random
+from discord.utils import get
+from commands.speech_synthesis import tts
+import discord
+import time
+
+on_tts = False
 
 ######### Bot Commands #########
 # @bot.event
@@ -25,7 +31,7 @@ async def on_message(message, bot):
         elif 'Maze' in username:    await message.channel.send('哇哦！爹！')
         else:                       await message.channel.send('我不认识你')
     
-    elif "捏" in user_message:      await message.channel.send('捏')
+    # elif "捏" in user_message:      await message.channel.send('捏')
     
     elif ("吗" in user_message or "嘛" in user_message) and random_reply_q == 3:
         reply_msg = user_message.replace("吗", "啊").replace("嘛", "啊").replace("？", "！")
@@ -41,5 +47,18 @@ async def on_message(message, bot):
     elif ("原" in user_message or "O" in user_message or "p" in user_message or "P" in user_message or "o" in user_message):
         if "Tony" in username and random_reply_o == 1:     await message.channel.send('我绰！有OP！')
     
+    if on_tts:
+        voice = get(bot.voice_clients, guild=message.guild)
+        if voice and voice.is_connected():
+            if (await tts(user_message)):
+                voice.play(discord.FFmpegPCMAudio("/Users/taozhang/Desktop/My Porjects/MazeBot-for-Discord/voices/test.mp3"))
+                voice.source = discord.PCMVolumeTransformer(voice.source)
+                voice.source.volume = 0.5
+                while voice.is_playing():
+                    time.sleep(1)
+                voice.stop()
+                # os.remove("/Users/taozhang/Desktop/My Porjects/MazeBot-for-Discord/test.mp3")
+                return
+
     await bot.process_commands(message)
 ##################################
