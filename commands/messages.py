@@ -4,6 +4,9 @@ from commands.speech_synthesis import tts
 import discord
 import time
 
+import importlib
+import commands.speech_synthesis
+
 on_tts = False
 
 ######### Bot Commands #########
@@ -46,11 +49,14 @@ async def on_message(message, bot):
     
     elif ("原" in user_message or "O" in user_message or "p" in user_message or "P" in user_message or "o" in user_message):
         if "Tony" in username and random_reply_o == 1:     await message.channel.send('我绰！有OP！')
-    
+
     if on_tts:
         voice = get(bot.voice_clients, guild=message.guild)
         if voice and voice.is_connected():
-            if (await tts(user_message)):
+            importlib.reload(commands.speech_synthesis)
+            from commands.speech_synthesis import tts
+
+            if (await tts(message)):
                 voice.play(discord.FFmpegPCMAudio("/Users/taozhang/Desktop/My Porjects/MazeBot-for-Discord/voices/test.mp3"))
                 voice.source = discord.PCMVolumeTransformer(voice.source)
                 voice.source.volume = 0.5
