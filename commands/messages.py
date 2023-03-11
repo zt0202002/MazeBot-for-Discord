@@ -18,7 +18,7 @@ async def on_message(message, bot):
     channel = str(message.channel.name)
     user_message = str(message.content)
 
-    print(f'[{channel}] {username}: {user_message}')
+    print(f'[{message.author.name}][{channel}] {username}: {user_message}')
 
     random_reply_q = random.randint(1, 100)
     random_reply_b = random.randint(1, 100)

@@ -4,38 +4,68 @@ from discord import FFmpegPCMAudio
 from os.path import exists
 from youtube_dl import YoutubeDL
 from pytube import Playlist, YouTube as yt
+from Database.dbloader import *
 
 import json 
 
 song_queue = {}
 current_song = {}
 
-async def addToQueue(guild, ctx=None, url = None):
-    if guild.id not in song_queue:
-        song_queue[guild.id] = []
+async def addToQueue(ctx, url):
+    dbloader = DBloader()
+    dbloader.load_all(ctx)
+    server = dbloader.server
+    channel = dbloader.channel
+    user = dbloader.user
+
+    print(server.sname)
+
+    # playlist = Playlist(url)
+    # c = 0
+    # for video in playlist.videos:
+    #     print('title: ' + video.title + ', url: ' + video.watch_url)
+    #     server.add_song(user.uid, channel.cid, video.watch_url)
+    #     c += 1
+    # return c
 
     try:
         playlist = Playlist(url)
-        for video in playlist.videos:
-            song_queue[guild.id].append(video)
-        return len(playlist.videos)
+        c = await server.add_song_to_queue(user.uid, channel.cid, playlist)
+        return c
     except:
         try:
-            video = yt(url)
-            song_queue[guild.id].append(video)
+            print('~')
+            server.add_song(user.uid, channel.cid, url)
             return 1
         except:
             return False
-    # else:
-    #     try:
-    #         if "entries" in song:
-    #             for i in song['entries']:
-    #                 song_queue[guild.id].append(i)
-    #         else:
-    #             song_queue[guild.id].append(song)
-    #         return 1
-    #     except:
-    #         return False
+
+# async def addToQueue(guild, ctx=None, url = None):
+#     if guild.id not in song_queue:
+#         song_queue[guild.id] = []
+
+#     try:
+#         playlist = Playlist(url)
+#         for video in playlist.videos:
+#             song_queue[guild.id].append(video)
+#         return len(playlist.videos)
+#     except:
+#         try:
+#             video = yt(url)
+#             song_queue[guild.id].append(video)
+#             return 1
+#         except:
+#             return False
+#     # else:
+#     #     try:
+#     #         if "entries" in song:
+#     #             for i in song['entries']:
+#     #                 song_queue[guild.id].append(i)
+#     #         else:
+#     #             song_queue[guild.id].append(song)
+#     #         return 1
+#     #     except:
+#     #         return False
 
 def check_queue(ctx, id):
     if song_queue[id] != []:
@@ -54,6 +84,29 @@ def check_queue(ctx, id):
     else:
         current_song[id] = {}
         return None
+
+def play_first_song(voice):
+    dbloader = DBloader()
+    server = dbloader.load_server(voice.guild.id)
+
+    try:
+        server.mark_first_song_played()
+        song = server.play_first_song()
+        
+        with YoutubeDL(YDL_OPTIONS) as ydl: cur_info = ydl.extract_info(song.url, download=False)
+        source = FFmpegPCMAudio(cur_info['url'], **FFMPEG_OPTIONS)
+        voice.play(source, after=lambda x=0: play_first_song(voice))
+
+        print('Playing: ' + cur_info['title'], cur_info['duration'])
+        server.add_time_to_cur_playing_song(voice.guild.id, cur_info['duration'])
+        song.time = cur_info['duration']
+
+        return song
+    except:
+        return False
+    
+
+    # return cur_info
 
 async def save_queue_into_file(voice, id, path='ServerHistory'):
     file = f'./QueueLog/{path}/{id}.json'

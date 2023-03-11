@@ -25,6 +25,8 @@ from datetime import datetime
 from commands import messages, test_slash, cmd_join, cmd_play, cmd_search, cmd_queue, cmd_current, cmd_delete
 from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random, cmd_minecraft
 
+from Database.dbloader import *
+
 load_dotenv()
 intents = discord.Intents.all()
 
@@ -33,6 +35,7 @@ class Bot(commands.Bot):
     def __init__(self):
         super().__init__(intents = intents, command_prefix=';')
         self.synced = False #we use this so the bot doesn't sync commands more than once
+        initialize_db()
 
     async def on_ready(self):
         await self.wait_until_ready()

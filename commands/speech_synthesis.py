@@ -1,5 +1,25 @@
 import os
 import azure.cognitiveservices.speech as speechsdk
+import requests
+import json
+import sys
+
+def suo(text:str):
+    r = requests.post('https://lab.magiconch.com/api/nbnhhsh/guess',data={'text':str(text)})
+    tran = ""
+    try:
+        trans = json.loads(r.text)[0]['trans']
+    except KeyError as e:
+        print('可能暂时没有这个缩写！')
+        print(e)
+    for i in trans:
+        if len(trans) == 1:
+            return i
+            break
+        else:
+            tran += i+"，"
+
+    return tran[:-1]
 
 async def tts(message):
     msg = message.content
@@ -31,10 +51,16 @@ async def tts(message):
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
 
 
+    # print(f'file_name: {msg}')
+    # try:
+    #     new_msg = suo(msg).split('，')[0]
+    # except:
+    #     new_msg = msg
+    # msg = new_msg
     print(f'file_name: {msg}')
     # Get text from the console and synthesize to the default speaker.
     speech_synthesis_result = speech_synthesizer.speak_text_async(msg).get()
-
+ 
     if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
         print("Speech synthesized for text [{}]".format(msg))
         return True
