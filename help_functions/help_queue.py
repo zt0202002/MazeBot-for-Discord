@@ -2,7 +2,7 @@ from help_functions.help_text import *
 from help_functions.help_time import *
 from discord import FFmpegPCMAudio
 from os.path import exists
-from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 from pytube import Playlist, YouTube as yt
 
 import json 

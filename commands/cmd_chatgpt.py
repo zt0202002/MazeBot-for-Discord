@@ -1,0 +1,69 @@
+import requests, json, discord, logging, sys, signal, asyncio, functools, typing, os
+#from revChatGPT.ChatGPT import Chatbot
+#from revChatGPT.Official import Chatbot
+from revChatGPT.V3 import Chatbot
+
+from dotenv import load_dotenv
+
+chatbot = None
+
+def split_string_into_chunks(string, chunk_size):
+  chunks = []# Create an empty list to store the chunks
+  while len(string) > 0:# Use a while loop to iterate over the string
+    chunk = string[:chunk_size]# Get the first chunk_size characters from the string
+    chunks.append(chunk)# Add the chunk to the list of chunks
+    string = string[chunk_size:]# Remove the chunk from the original string
+  return chunks# Return the list of chunks
+
+def tidy_response(i):# Optionally spoilerify or hide the most repetitive annoying nothing responses, rebrand to EvilCorp
+    spoiler_bad_responses=False
+    hide_bad_responses=True
+    rebrand_responses=True
+    bad_responses=["As a large language model trained by OpenAI,","As a language model trained by OpenAI,","My training data has a cutoff date of 2021, so I don't have knowledge of any events or developments that have occurred since then.","I'm not able to browse the internet or access any new information, so I can only provide answers based on the data that I was trained on.","I don't have the ability to provide personal opinions or subjective judgments, as I'm only able to provide objective and factual information.","I'm not able to engage in speculative or hypothetical discussions, as I can only provide information that is based on verifiable facts.","I'm not able to provide medical, legal, or financial advice, as I'm not a qualified professional in these fields.","I'm not able to engage in conversations that promote or encourage harmful or offensive behavior.","I don't have personal experiences or opinions, and I can't provide personalized advice or recommendations.","As a language model, I'm not able to perform actions or execute commands. I can only generate text based on the input I receive.","I'm not able to provide direct answers to questions that require me to make judgments or evaluations, such as questions that ask for my opinion or perspective on a topic.","I can provide information on a wide range of subjects, but my knowledge is limited to what I have been trained on and I do not have the ability to browse the internet to find new information","I do not have the ability to browse the internet or access information outside of what I have been trained on.","I'm sorry, but as a large language model trained by OpenAI, "]
+    if i.find("`") == -1: # Only attempt if no code block is inside the response
+        if spoiler_bad_responses:
+            #bad_responses_found=[response.replace(response, "||" + response + "||") for response in bad_responses if response in i]
+            bad_responses_found=[response for response in bad_responses if response in i]
+            bad_responses_string = "".join(bad_responses_found)
+        if hide_bad_responses:
+            for br in bad_responses:i=i.replace(br, "")
+        if spoiler_bad_responses and bad_responses_string != '':i+='\n||'+bad_responses_string+'||'
+    if rebrand_responses:
+        i=i.replace("OpenAI", "MazeCharmZzT")
+        i=i.replace("!Dream:", "!dream ")
+    return i
+
+# def to_thread(func: typing.Callable) -> typing.Coroutine:
+#     @functools.wraps(func)
+#     async def wrapper(*args, **kwargs):
+#         loop = asyncio.get_event_loop()
+#         wrapped = functools.partial(func, *args, **kwargs)
+#         return await loop.run_in_executor(None, wrapped)
+#     return wrapper
+
+# @to_thread
+async def get_answer(chatbot,query,id):
+    response = chatbot.ask(query,user=id)
+    return response
+    prev_text = ""
+    for data in chatbot.ask(query):
+        print('str indicies: ', data)
+        message = data["message"][len(prev_text):]
+        print(message, end="", flush=True)
+        prev_text = data["message"]
+    return prev_text
+
+
+async def turn_on_chatgpt():
+    load_dotenv()
+    global chatbot
+    key = os.getenv('CHATGPT_API_KEY')
+    print(f'{key}')
+    chatbot = Chatbot(api_key=f"{os.getenv('CHATGPT_API_KEY')}", max_tokens=2048)
+
+def turn_off_chatgpt():
+    global chatbot
+    chatbot = None
+    # return chatbot
+
+# async def chatgpt(msg, str):

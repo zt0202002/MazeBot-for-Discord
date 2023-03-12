@@ -2,7 +2,8 @@ from discord.utils import get
 from help_functions.help_text import *
 from help_functions.help_time import *
 from discord import FFmpegPCMAudio
-from youtube_dl import YoutubeDL
+# from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 from help_functions.help_queue import *
 
 
@@ -50,6 +51,8 @@ async def play_music(ctx, bot, msg, new_song_len):
     if not voice.is_playing():
         cur_info = song_queue[ctx.guild.id].pop(0)
 
+
+        print('play_music: ', cur_info.watch_url)
         with YoutubeDL(YDL_OPTIONS) as ydl: cur_info = ydl.extract_info(cur_info.watch_url, download=False)
 
         temp = {}; temp['info'] = cur_info; temp['time'] = datetime.now()

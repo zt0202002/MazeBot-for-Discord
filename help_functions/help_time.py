@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from youtube_dl import YoutubeDL
 
 YDL_OPTIONS = {
         'format': 'bestaudio/best',

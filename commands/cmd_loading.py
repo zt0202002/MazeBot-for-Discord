@@ -2,7 +2,7 @@ from discord.utils import get
 from help_functions.help_text import *
 from help_functions.help_time import *
 from discord import FFmpegPCMAudio
-from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 from help_functions.help_queue import *
 from os.path import exists
 

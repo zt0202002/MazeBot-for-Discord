@@ -7,10 +7,135 @@ import time
 import importlib
 import commands.speech_synthesis
 
+from commands.cmd_chatgpt import *
+import commands.cmd_chatgpt as chatgpt
+
+import requests, json, discord, logging, sys, signal, asyncio, functools, typing, os
+
 on_tts = False
+userdb={}
 
 ######### Bot Commands #########
 # @bot.event
+async def on_message(message, bot):
+    chatbot = chatgpt.chatbot
+
+    if chatbot is None:
+        if message.content.startswith(';;on'):
+            await message.channel.send('Starting chatbot...')
+            await turn_on_chatgpt()
+            return
+        elif message.content.startswith(';;off'):
+            await message.channel.send('Chatbot is off...')
+            await turn_off_chatgpt()
+            return
+            
+        else:
+            await bot.process_commands(message)
+            return
+    
+    if message.author == bot.user: 
+        await bot.process_commands(message)
+        return
+    # if message.channel.id != config["discord_channel"] and type(message.channel)!=discord.DMChannel: return
+    
+    if message.author.bot:
+        await bot.process_commands(message)
+        return
+    
+    print(message.channel.id)
+    if message.channel.id != 1084285046220918864 and not message.content.startswith(';;') and not message.content.startswith('；；'): 
+        await bot.process_commands(message)
+        return
+    
+    # if message.content == '!refresh': chatbot.refresh_session(); await message.add_reaction("🔄"); print("refresh session"); return
+    # if message.content == '!restart' and message.author.id == config['discord_admin_id']: os.execl(__file__, *sys.argv);return
+    if message.content == '!reset': chatbot.reset();await message.add_reaction("💪"); print("reset chat"); return
+    if message.content.startswith('\\'):
+        await bot.process_commands(message)
+        return
+    
+    longquery=''
+    # if message.content.startswith(';;'):
+    #     authperm=message.content[2:]
+    #     print(authperm)
+    #     author=authperm.split("/")[0]
+    #     permlink=authperm.split("/")[1].split(' ')[0].split('\n')[0]
+    #     headers={
+    #         "id":2,
+    #         "jsonrpc":"2.0",
+    #         "method":"condenser_api.get_content",
+    #         "params": ["{}".format(author), "{}".format(permlink)]
+    #     }
+    #     response=requests.post("https://api.hive.blog/",json=headers)
+    #     post=json.loads(response.text)
+    #     post=post['result']
+    #     body=post['body']
+    #     title=post['title']
+    #     longquery=title+'\n'+body
+    #     print('attaching hive post '+author+'/'+permlink+' : '+title)
+    if message.attachments and message.attachments[0].width and message.attachments[0].height:
+        #image_url = message.attachments[0].proxy_url
+        #image_desc = extract_text_from_image_url(image_url)
+        #longquery=await message.reply(image_desc)
+        return
+    if message.attachments and message.attachments[0].content_type.startswith('text'):
+        print('text attachment found, adding to prompt')
+        attachment=message.attachments[0]
+        data=await attachment.read()
+        longquery=data.decode()
+    # if message.mentions:
+    #     for user in message.mentions:
+    #         if user != client.user: return
+    print(message.author.name+':'+message.content)
+    cid=None
+    did=str(message.channel.id)
+    print(did)
+    cb=chatbot
+    if did in userdb:
+        cid=userdb[message.channel.id]
+    else:
+        cid=None
+
+    try:
+        query=message.content
+        if longquery and longquery != '':
+            query=message.content+'\n```'+longquery+'\n```'
+        # if isinstance(message.channel,discord.channel.DMChannel) and config["dm"]=="False":#DM, and DM's not disabled in config
+        #     await message.reply("Direct messages have been disabled")
+        #     return
+        else:#In channel
+            async with message.channel.typing():
+                response=await get_answer(cb,query,did)
+        #userdb[did]={'cid':response['conversation_id']}
+        #print(userdb)
+        # print(response)
+        # print('ai:'+response["choices"][0]["text"]) #official
+        #r=tidy_response(response["choices"][0]["text"]) #unofficial
+        r=tidy_response(response)
+        chunks=split_string_into_chunks(r,1975) # Make sure response chunks fit inside a discord message (max 2k characters)
+        for chunk in chunks:
+            await message.reply(chunk)
+
+    except Exception as e:
+        print("Something went wrong!")
+        error=(str(e))
+        #if error == "'NoneType' object is not subscriptable":
+        #if error == "('Response code error: ', 429)":
+        #    error+='\nPlease wait for your previous response to be answered before asking another'
+        if error == "('Response code error: ', 403)":
+            error+='\n403 forbidden response from api server'
+        if error == "('Response code error: ', 524)":
+            error+='\nHTTP response status code 524 A timeout occurred is an unofficial server error that is specific to Cloudflare. This HTTP status code occurs when a successful HTTP connection was made to the origin server but the HTTP Connection timed out before the HTTP request was complete'
+        if error == "('Response code error: ', 502)":
+            error+='\nHTTP response status code 502 Bad Gateway server error response code indicates that the server, while acting as a gateway or proxy, received an invalid response from the upstream server.'
+        errorembed=discord.Embed(description=':warning: '+error, color=0xFF5733)
+        await message.reply(embed=errorembed)
+        await message.add_reaction("💩")
+
+    await bot.process_commands(message)
+
+'''
 async def on_message(message, bot):
     if message.author == bot.user: return
 
@@ -67,4 +192,5 @@ async def on_message(message, bot):
                 return
 
     await bot.process_commands(message)
+'''
 ##################################
