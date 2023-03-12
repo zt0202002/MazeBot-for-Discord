@@ -18,22 +18,51 @@ userdb={}
 ######### Bot Commands #########
 # @bot.event
 async def on_message(message, bot):
+    if message.content.startswith(';;/'):
+        await bot.process_commands(message)
+        return
+    gid = message.guild.id
+    did = message.channel.id
     chatbot = chatgpt.chatbot
 
-    if chatbot is None:
+    if gid not in chatbot or chatbot[gid] is None:
         if message.content.startswith(';;on'):
             await message.channel.send('Starting chatbot...')
-            await turn_on_chatgpt()
+            await turn_on_chatgpt(gid)
             return
-        elif message.content.startswith(';;off'):
-            await message.channel.send('Chatbot is off...')
-            await turn_off_chatgpt()
-            return
-            
         else:
             await bot.process_commands(message)
             return
-    
+    chatbot = chatbot[gid]
+
+    if message.content.startswith(';;on'):
+        await message.channel.send('Chatbot is already on...')
+        return
+    elif message.content.startswith(';;off'):
+        await message.channel.send('Chatbot is off...')
+        await turn_off_chatgpt(gid)
+        return
+    elif message.content.startswith(';;reset'):
+        await message.channel.send('Resetting chatbot...')
+        await chatbot.reset()
+        return
+    elif message.content.startswith(';;pop'):
+        await message.channel.send('Populating chatbot...')
+        if len(chatbot.conversation['default']) > 1:
+            chatbot.conversation['default'].pop(1)
+        return
+    elif message.content.startswith(';;show'):
+        await message.channel.send('Showing chatbot...')
+        print(chatbot.conversation['default'])
+        return
+    elif message.content.startswith(';;tokens'):
+        await message.channel.send(f'Showing tokens... [{chatbot.get_token_count()}]')
+        return
+    elif message.content.startswith(';;maxtokens'):
+        default = 'default'
+        await message.channel.send(f'Showing max tokens... [{chatbot.get_max_tokens(default)}]')
+        return
+
     if message.author == bot.user: 
         await bot.process_commands(message)
         return
@@ -90,7 +119,7 @@ async def on_message(message, bot):
     print(message.author.name+':'+message.content)
     cid=None
     did=str(message.channel.id)
-    print(did)
+    # print(did)
     cb=chatbot
     if did in userdb:
         cid=userdb[message.channel.id]
@@ -98,6 +127,8 @@ async def on_message(message, bot):
         cid=None
 
     try:
+        clear_previous_chat_history(chatbot)
+        msg = await message.reply('Thinking...')
         query=message.content
         if longquery and longquery != '':
             query=message.content+'\n```'+longquery+'\n```'
@@ -115,8 +146,8 @@ async def on_message(message, bot):
         r=tidy_response(response)
         chunks=split_string_into_chunks(r,1975) # Make sure response chunks fit inside a discord message (max 2k characters)
         for chunk in chunks:
-            await message.reply(chunk)
-
+            await msg.edit(content=chunk)
+        
     except Exception as e:
         print("Something went wrong!")
         error=(str(e))
@@ -133,7 +164,7 @@ async def on_message(message, bot):
         await message.reply(embed=errorembed)
         await message.add_reaction("💩")
 
-    await bot.process_commands(message)
+    # await bot.process_commands(message)
 
 '''
 async def on_message(message, bot):

@@ -5,7 +5,7 @@ from revChatGPT.V3 import Chatbot
 
 from dotenv import load_dotenv
 
-chatbot = None
+chatbot = {}
 
 def split_string_into_chunks(string, chunk_size):
   chunks = []# Create an empty list to store the chunks
@@ -54,16 +54,26 @@ async def get_answer(chatbot,query,id):
     return prev_text
 
 
-async def turn_on_chatgpt():
+async def turn_on_chatgpt(gid, prompt=None):
     load_dotenv()
     global chatbot
     key = os.getenv('CHATGPT_API_KEY')
-    print(f'{key}')
-    chatbot = Chatbot(api_key=f"{os.getenv('CHATGPT_API_KEY')}", max_tokens=2048)
+    # print(f'{key}')
+    if prompt is None:
+        with open('chatgpt_prompts/dcbot_prompt.prompt', 'r') as file:
+            prompt = file.read()
+    chatbot[gid] = Chatbot(api_key=key, max_tokens=3096, system_prompt=prompt)
 
-def turn_off_chatgpt():
+def turn_off_chatgpt(gid):
     global chatbot
-    chatbot = None
+    chatbot[gid] = None
     # return chatbot
+
+def clear_previous_chat_history(chatbot):
+    if chatbot.get_max_tokens('default') > 1024: return
+    chat_len = len(chatbot.conversation['default'])
+    for i in range(chat_len):
+        if chatbot.get_max_tokens('default') <= 1536:
+            chatbot.conversation['default'].pop(1)
 
 # async def chatgpt(msg, str):
