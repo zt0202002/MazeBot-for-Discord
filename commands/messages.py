@@ -1,6 +1,6 @@
 import random
 from discord.utils import get
-from commands.speech_synthesis import tts
+# from commands.speech_synthesis import tts
 import discord
 import time
 
