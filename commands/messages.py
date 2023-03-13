@@ -73,7 +73,7 @@ async def on_message(message, bot):
         return
     
     print(message.channel.id)
-    if ((message.channel.id != 1084285046220918864 and message.channel.id != 1084883338873032704)
+    if ((message.channel.id != 1084285046220918864 and message.channel.id != 1084883338873032704 and message.channel.id != 1084945212029276242)
         and not message.content.startswith(';;') and not message.content.startswith('；；')): 
         await bot.process_commands(message)
         return
