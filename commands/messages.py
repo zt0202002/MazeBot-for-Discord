@@ -18,7 +18,7 @@ userdb={}
 ######### Bot Commands #########
 # @bot.event
 async def on_message(message, bot):
-    if message.content.startswith(';;/'):
+    if message.content.startswith('\\'):
         await bot.process_commands(message)
         return
     gid = message.guild.id
@@ -73,7 +73,8 @@ async def on_message(message, bot):
         return
     
     print(message.channel.id)
-    if message.channel.id != 1084285046220918864 and not message.content.startswith(';;') and not message.content.startswith('；；'): 
+    if ((message.channel.id != 1084285046220918864 or  message.channel.id != 1084883338873032704)
+        and not message.content.startswith(';;') and not message.content.startswith('；；')): 
         await bot.process_commands(message)
         return
     
