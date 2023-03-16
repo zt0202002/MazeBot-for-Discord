@@ -3,12 +3,12 @@ from help_functions.help_text import *
 from help_functions.help_time import *
 from help_functions.help_queue import *
 
-async def queue(ctx, bot):
+async def queue(ctx, bot, msg=None):
     voice = get(bot.voice_clients, guild=ctx.guild)
     
     cur = str_loading_song
     cur.color = 0x487B60
-    msg = await ctx.send(embed=cur)
+    if msg is None: msg = await ctx.send(embed=cur)
 
 
     if ctx.guild.id not in current_song or current_song[ctx.guild.id] == {}:

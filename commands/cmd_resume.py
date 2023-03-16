@@ -1,7 +1,7 @@
 import discord
 from discord.utils import get
 
-async def resume(ctx, bot):
+async def resume(ctx, bot, msg=None):
     voice = get(bot.voice_clients, guild=ctx.guild)
 
     if not voice.is_playing():
@@ -9,9 +9,12 @@ async def resume(ctx, bot):
         embedVar = discord.Embed(title=f'歌曲又开始播放啦！', description=f'', color=0x487B60)
     else:
         embedVar = discord.Embed(title=f'歌曲已经在播放啦！', description=f'', color=0x487B60)
-    await ctx.send(embed=embedVar)
+    if msg is None:
+        await ctx.send(embed=embedVar)
+    else:
+        await msg.edit(content = '', embed=embedVar)
 
-async def pause(ctx, bot):
+async def pause(ctx, bot, msg=None):
     voice = get(bot.voice_clients, guild=ctx.guild)
 
     if voice.is_playing():
@@ -19,4 +22,7 @@ async def pause(ctx, bot):
         embedVar = discord.Embed(title=f'歌曲被暂停啦！', description=f'', color=0x487B60)
     else:
         embedVar = discord.Embed(title=f'歌曲已经被暂停啦！', description=f'', color=0x487B60)
-    await ctx.send(embed=embedVar)
+    if msg is None:
+        await ctx.send(embed=embedVar)
+    else:
+        await msg.edit(content = '', embed=embedVar)

@@ -16,6 +16,7 @@ async def addToQueue(guild, ctx=None, url = None):
 
     try:
         playlist = Playlist(url)
+        assert len(playlist.videos) > 0
         for video in playlist.videos:
             song_queue[guild.id].append(video)
         return len(playlist.videos)

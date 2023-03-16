@@ -18,17 +18,29 @@ userdb={}
 ######### Bot Commands #########
 # @bot.event
 async def on_message(message, bot):
+    if message.guild is None:
+        await bot.process_commands(message)
+        return
     if message.content.startswith('\\'):
         await bot.process_commands(message)
         return
+    
+    # initialize music bot gpt
+
     gid = message.guild.id
     did = message.channel.id
     chatbot = chatgpt.chatbot
 
+    if 'music' not in chatbot:    await turn_on_chatgpt('music', 'music')
+    
     if gid not in chatbot or chatbot[gid] is None:
         if message.content.startswith(';;on'):
             await message.channel.send('Starting chatbot...')
             await turn_on_chatgpt(gid)
+            return
+        if message.content.startswith('.') or message.content.startswith('。'):
+            music_chat_bot = chatgpt.chatbot['music']
+            await send_gpt_msg(message, bot, music_chat_bot)
             return
         else:
             await bot.process_commands(message)
@@ -44,7 +56,7 @@ async def on_message(message, bot):
         return
     elif message.content.startswith(';;reset'):
         await message.channel.send('Resetting chatbot...')
-        await chatbot.reset()
+        chatbot.reset()
         return
     elif message.content.startswith(';;pop'):
         await message.channel.send('Populating chatbot...')
@@ -72,9 +84,10 @@ async def on_message(message, bot):
         await bot.process_commands(message)
         return
     
-    print(message.channel.id)
+    # print(message.channel.id)
     if ((message.channel.id != 1084285046220918864 and message.channel.id != 1084883338873032704 and message.channel.id != 1084945212029276242 and message.channel.id != 1085348253039603772)
-        and not message.content.startswith(';;') and not message.content.startswith('；；')): 
+        and not message.content.startswith('!') and not message.content.startswith('！')
+        and not message.content.startswith(';') and not message.content.startswith('；')): 
         await bot.process_commands(message)
         return
     
@@ -118,17 +131,51 @@ async def on_message(message, bot):
     #     for user in message.mentions:
     #         if user != client.user: return
     print(message.author.name+':'+message.content)
-    cid=None
-    did=str(message.channel.id)
+
+    await send_gpt_msg(message, bot, chatbot, longquery)
+    # cid=None
+    
     # print(did)
-    cb=chatbot
-    if did in userdb:
-        cid=userdb[message.channel.id]
-    else:
-        cid=None
+    # cb=chatbot
+    # if did in userdb:
+    #     cid=userdb[message.channel.id]
+    # else:
+    #     cid=None
+
+
+async def send_gpt_msg(message, bot, cb, longquery=''):
+    did=str(message.channel.id)
+
+    clear_previous_chat_history(cb)
+    msg = await message.reply('Thinking...')
+    query=message.content
+    if longquery and longquery != '':
+        query=message.content+'\n```'+longquery+'\n```'
+    # if isinstance(message.channel,discord.channel.DMChannel) and config["dm"]=="False":#DM, and DM's not disabled in config
+    #     await message.reply("Direct messages have been disabled")
+    #     return
+    else:#In channel
+        async with message.channel.typing():
+            if message.content.startswith('.') or message.content.startswith('。'):
+                response=await get_answer(chatbot['music'],query,did)
+            else:
+                response=await get_answer(cb,query,did)
+    #userdb[did]={'cid':response['conversation_id']}
+    #print(userdb)
+    # print(response)
+    # print('ai:'+response["choices"][0]["text"]) #official
+    #r=tidy_response(response["choices"][0]["text"]) #unofficial
+
+    if await is_music_commands(message, bot, msg, response):  return
+
+    r=tidy_response(response)
+    chunks=split_string_into_chunks(r,1975) # Make sure response chunks fit inside a discord message (max 2k characters)
+    for chunk in chunks:
+        await msg.edit(content=chunk)
+    return
 
     try:
-        clear_previous_chat_history(chatbot)
+        clear_previous_chat_history(cb)
         msg = await message.reply('Thinking...')
         query=message.content
         if longquery and longquery != '':
@@ -138,12 +185,18 @@ async def on_message(message, bot):
         #     return
         else:#In channel
             async with message.channel.typing():
-                response=await get_answer(cb,query,did)
+                if message.content.startswith('.') or message.content.startswith('。'):
+                    response=await get_answer(chatbot['music'],query,did)
+                else:
+                    response=await get_answer(cb,query,did)
         #userdb[did]={'cid':response['conversation_id']}
         #print(userdb)
         # print(response)
         # print('ai:'+response["choices"][0]["text"]) #official
         #r=tidy_response(response["choices"][0]["text"]) #unofficial
+
+        if await is_music_commands(message, bot, msg, response):  return
+
         r=tidy_response(response)
         chunks=split_string_into_chunks(r,1975) # Make sure response chunks fit inside a discord message (max 2k characters)
         for chunk in chunks:

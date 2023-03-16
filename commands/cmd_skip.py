@@ -38,18 +38,30 @@ async def skipto(ctx, index, bot):
     else:
         await msg.edit(content='', embed=str_not_song_playing)
 
-async def skip(ctx, bot):
+async def skip(ctx, bot, msg=None):
     voice = get(bot.voice_clients, guild=ctx.guild)
 
     if voice.is_playing():
         voice.stop()
         if ctx.guild.id not in song_queue:
-            await ctx.send(embed=str_no_song_next)
+            if msg is None:
+                await ctx.send(embed=str_no_song_next)
+            else:
+                await msg.edit(content = '', embed=str_no_song_next)
         elif len(song_queue[ctx.guild.id]) != 0:
             info = song_queue[ctx.guild.id][0]
             embedVar = discord.Embed(title=f'我来播放这首歌了捏！', description=f'{info.title}\n{info.watch_url}', color=0x8B4C39)
-            await ctx.send(embed=embedVar)
+            if msg is None:
+                await ctx.send(embed=embedVar)
+            else:
+                await msg.edit(content = '', embed=embedVar)
         else:
-            await ctx.send(embed=str_no_song_next)
+            if msg is None:
+                await ctx.send(embed=str_no_song_next)
+            else:
+                await msg.edit(content = '', embed=str_no_song_next)
     else:
-        await ctx.send(embed=str_not_song_playing)
+        if msg is None:
+            await ctx.send(embed=str_not_song_playing)
+        else:
+            await msg.edit(content = '', embed=str_not_song_playing)

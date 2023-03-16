@@ -4,6 +4,7 @@ import requests, json, discord, logging, sys, signal, asyncio, functools, typing
 from revChatGPT.V3 import Chatbot
 
 from dotenv import load_dotenv
+from commands import cmd_play, cmd_queue, cmd_join, cmd_current, cmd_resume, cmd_search, cmd_skip
 
 chatbot = {}
 
@@ -62,6 +63,11 @@ async def turn_on_chatgpt(gid, prompt=None):
     if prompt is None:
         with open('chatgpt_prompts/dcbot_prompt.prompt', 'r') as file:
             prompt = file.read()
+    if prompt == 'music':
+        with open('chatgpt_prompts/dcbot_music.prompt', 'r') as file:
+            prompt = file.read()
+        chatbot[gid] = Chatbot(api_key=key, max_tokens=2048, system_prompt=prompt)
+        return
     chatbot[gid] = Chatbot(api_key=key, max_tokens=3096, system_prompt=prompt)
 
 def turn_off_chatgpt(gid):
@@ -75,5 +81,36 @@ def clear_previous_chat_history(chatbot):
     for i in range(chat_len):
         if chatbot.get_max_tokens('default') <= 1536:
             chatbot.conversation['default'].pop(1)
+
+async def is_music_commands(ctx, bot, msg, response):
+    global chatbot
+    # check if the message is a music command
+    if ('\\') not in response:   return False
+
+    # check valid commands
+    if '\play' in response:
+        url = response.split(' ')[1]
+        await cmd_play.play(ctx, url, bot, msg)
+    elif '\join' in response:
+        await cmd_join.join(ctx, bot, msg)
+    elif '\queue' in response:
+        await cmd_queue.queue(ctx, bot, msg)
+    elif '\current' in response:
+        await cmd_current.current(ctx, bot, msg)
+    elif '\\resume' in response:
+        await cmd_resume.resume(ctx, bot, msg)
+    elif '\search' in response:
+        content = response.split(' ', 1)[1]
+        await cmd_search.search(ctx, content, bot, msg)
+    elif '\pause' in response:
+        await cmd_resume.pause(ctx, bot, msg)
+    elif '\skip' in response:
+        await cmd_skip.skip(ctx, bot, msg)
+    else:
+        return False
+
+    music_gpt = chatbot['music']
+    music_gpt.reset()
+    return True
 
 # async def chatgpt(msg, str):

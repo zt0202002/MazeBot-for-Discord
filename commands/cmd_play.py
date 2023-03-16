@@ -9,12 +9,20 @@ from help_functions.help_queue import *
 
 async def play(ctx, url, bot, msg = None):
     voice = get(bot.voice_clients, guild=ctx.guild)
+    try:    channel = ctx.message.author.voice.channel
+    except: channel = ctx.author.voice.channel
 
-    if voice is None:   await ctx.send(embed=str_not_in_voice_channel); return
-    elif voice.channel != ctx.message.author.voice.channel: await ctx.send(embed=str_not_in_same_channel);  return
-    elif 'music.163.com' in url:    await ctx.send(embed=str_no_netease);   return
+    if voice is None:
+        if msg is None:     await ctx.send(embed=str_not_in_voice_channel); return
+        else:               await msg.edit(content='', embed=str_not_in_voice_channel); return
+    elif voice.channel != channel:
+        if msg is None:     await ctx.send(embed=str_not_in_same_channel);  return
+        else:               await msg.edit(content='', embed=str_not_in_same_channel);  return
+    elif 'music.163.com' in url:    
+        if msg is None:     await ctx.send(embed=str_no_netease);   return
+        else:               await msg.edit(content='', embed=str_no_netease);   return
 
-    if not msg: msg = await ctx.send(embed=str_loading_song)   
+    if msg is None: msg = await ctx.send(embed=str_loading_song)   
 
     new_song_len = await addToQueue(ctx.guild, url = url)
     

@@ -6,17 +6,25 @@ from yt_dlp import YoutubeDL
 from help_functions.help_queue import *
 from commands.cmd_play import play_music
 
-async def search(ctx, request, bot):
+async def search(ctx, request, bot, msg=None):
     voice = get(bot.voice_clients, guild=ctx.guild)
+    if msg is not None: channel = ctx.author.voice.channel
+    else:   channel = ctx.message.author.voice.channel
 
     if voice is None:
-        await ctx.send(embed=str_not_in_voice_channel)
+        if msg is None:
+            await ctx.send(embed=str_not_in_voice_channel)
+        else:
+            await msg.edit(content = '', embed=str_not_in_voice_channel)
         return
-    elif voice.channel != ctx.message.author.voice.channel:
-        await ctx.send(embed=str_not_in_same_channel)
+    elif voice.channel != channel:
+        if msg is None:
+            await ctx.send(embed=str_not_in_same_channel)
+        else:
+            await msg.edit(content = '', embed=str_not_in_same_channel)
         return
     
-    msg = await ctx.send(embed=str_loading_song)
+    if msg is None: msg = await ctx.send(embed=str_loading_song)
     
     with YoutubeDL(YDL_OPTIONS) as ydl:
         try:
@@ -28,9 +36,11 @@ async def search(ctx, request, bot):
             embedVar = discord.Embed(title=f'我找不到这首歌啊喂！', description="", color=0x8B4C39)
             await msg.edit(content = '', embed=embedVar)
             return
+        
+        print(info['webpage_url'])
 
         await addToQueue(ctx.guild, url = info['webpage_url'])
-        await play_music(ctx, voice, msg, 1)
+        await play_music(ctx, bot, msg, 1)
 
         # url = info['url']
         # source = FFmpegPCMAudio(url, **FFMPEG_OPTIONS)
