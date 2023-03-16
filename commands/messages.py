@@ -33,14 +33,15 @@ async def on_message(message, bot):
 
     if 'music' not in chatbot:    await turn_on_chatgpt('music', 'music')
     
+    if message.content.startswith('.') or message.content.startswith('。'):
+        music_chat_bot = chatgpt.chatbot['music']
+        await send_gpt_msg(message, bot, music_chat_bot)
+        return
+
     if gid not in chatbot or chatbot[gid] is None:
         if message.content.startswith(';;on'):
             await message.channel.send('Starting chatbot...')
             await turn_on_chatgpt(gid)
-            return
-        if message.content.startswith('.') or message.content.startswith('。'):
-            music_chat_bot = chatgpt.chatbot['music']
-            await send_gpt_msg(message, bot, music_chat_bot)
             return
         else:
             await bot.process_commands(message)

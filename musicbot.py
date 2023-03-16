@@ -23,7 +23,7 @@ from help_functions.help_queue import *
 from datetime import datetime
 
 from commands import messages, test_slash, cmd_join, cmd_play, cmd_search, cmd_queue, cmd_current, cmd_delete
-from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random, cmd_minecraft
+from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random, cmd_minecraft, cmd_chatgpt
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -128,5 +128,15 @@ async def on_tts(ctx, *, text: str):
 async def clear(ctx, amount: int): 
     await ctx.send("Clearing...")
     await ctx.channel.purge(limit=amount + 1)
+
+@bot.hybrid_command(with_app_command=True, name = 'chatgpt_on', description=dp.chatgpton) #guild specific slash command
+async def chatgpt_on(ctx):
+    await cmd_chatgpt.turn_on_chatgpt(ctx.guild.id)
+    await ctx.send("开启聊天功能！")
+
+@bot.hybrid_command(with_app_command=True, name = 'chatgpt_off', description=dp.chatgptoff) #guild specific slash command
+async def chatgpt_off(ctx):
+    await cmd_chatgpt.turn_off_chatgpt(ctx.guild.id)
+    await ctx.send("关闭聊天功能！")
 
 bot.run(os.getenv('TOKEN2'))
