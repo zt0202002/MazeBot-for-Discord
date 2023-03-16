@@ -17,4 +17,4 @@ async def current(ctx, bot, msg=None):
         if msg is None:
             await ctx.send(embed=embedVar)
         else:
-            await ctx.send(embed=embedVar)
+            await msg.edit(content = '', embed=embedVar)
