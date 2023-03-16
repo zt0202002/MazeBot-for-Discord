@@ -59,9 +59,16 @@ async def play_music(ctx, bot, msg, new_song_len):
     if not voice.is_playing():
         cur_info = song_queue[ctx.guild.id].pop(0)
 
-
-        print('play_music: ', cur_info.watch_url)
-        with YoutubeDL(YDL_OPTIONS) as ydl: cur_info = ydl.extract_info(cur_info.watch_url, download=False)
+        try:
+            print('play_music: ', cur_info.watch_url)
+            with YoutubeDL(YDL_OPTIONS) as ydl: cur_info = ydl.extract_info(cur_info.watch_url, download=False)
+        except:
+            cur_info = cur_info
+        
+        # print(cur_info['url'])
+        # print(cur_info['title'])
+        # print(cur_info['webpage_url'])
+        
 
         temp = {}; temp['info'] = cur_info; temp['time'] = datetime.now()
         current_song[ctx.guild.id] = temp

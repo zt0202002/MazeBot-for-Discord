@@ -139,4 +139,4 @@ async def chatgpt_off(ctx):
     await cmd_chatgpt.turn_off_chatgpt(ctx.guild.id)
     await ctx.send("关闭聊天功能！")
 
-bot.run(os.getenv('TOKEN2'))
+bot.run(os.getenv('TOKEN'))

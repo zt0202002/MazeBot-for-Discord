@@ -14,19 +14,34 @@ async def addToQueue(guild, ctx=None, url = None):
     if guild.id not in song_queue:
         song_queue[guild.id] = []
 
-    try:
-        playlist = Playlist(url)
-        assert len(playlist.videos) > 0
-        for video in playlist.videos:
-            song_queue[guild.id].append(video)
-        return len(playlist.videos)
-    except:
+    if 'bilibili' in url:
         try:
-            video = yt(url)
-            song_queue[guild.id].append(video)
-            return 1
+            with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
+            count = 0
+            if 'entries' in info:
+                for i in info['entries']:
+                    song_queue[guild.id].append(i)
+                    count += 1
+                return count
+            else:
+                song_queue[guild.id].append(info)
+                return 1
         except:
             return False
+    else:
+        try:
+            playlist = Playlist(url)
+            assert len(playlist.videos) > 0
+            for video in playlist.videos:
+                song_queue[guild.id].append(video)
+            return len(playlist.videos)
+        except:
+            try:
+                video = yt(url)
+                song_queue[guild.id].append(video)
+                return 1
+            except:
+                return False
     # else:
     #     try:
     #         if "entries" in song:
@@ -45,7 +60,11 @@ def check_queue(ctx, id):
         elif not voice:                 return None
         else:
             cur_info = song_queue[id].pop(0)
-            with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(cur_info.watch_url, download=False)
+            try:    
+                url = cur_info.watch_url
+                with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
+            except: 
+                info = cur_info['url']
 
             temp = {}; temp['info'] = info; temp['time'] = datetime.now()
             current_song[id] = temp
