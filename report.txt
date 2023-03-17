@@ -1,3 +1,10 @@
 [2022-12-16 06:59:38.167456] MazeCharmZzt#2964 reported: bug
 [2022-12-16 06:59:43.411405] MazeCharmZzt#2964 reported: bugbug
 [2022-12-17 18:09:28.536546] MazeCharmZzt#2964 reported: History should install [web url] rather than the downloadable link.
+[2023-03-16 08:17:49.829964] MazeCharmZzt#2964 reported: 播放的关键词有问题，会触发youtube链接。例子：播放hikari instrumental version
+[2023-03-16 08:19:35.839297] MazeCharmZzt#2964 reported: 卡住，。播放hikari instrumental version，这不是链接
+[2023-03-16 08:31:54.326328] MazeCharmZzt#2964 reported: queue有问题，读取不了
+[2023-03-16 08:33:06.919209] MazeCharmZzt#2964 reported: video_details有问题
+[2023-03-16 08:49:42.920530] MazeCharmZzt#2964 reported: dearly beloved but not the kh2 and kh1 version , dearly beloved but not from the kh2 and kh1 version
+[2023-03-16 09:01:34.018275] MazeCharmZzt#2964 reported: /leave没写
+[2023-03-16 19:12:58.552898] MazeCharmZzt#2964 reported: https://www.bilibili.com/video/BV1gq4y167mq?p=2&vd_source=f4f0625700704ee55dbbb245935f017a
