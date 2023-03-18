@@ -11,10 +11,13 @@ song_queue = {}
 current_song = {}
 
 async def addToQueue(guild, ctx=None, url = None):
+    global song_queue
+    global current_song
+
     if guild.id not in song_queue:
         song_queue[guild.id] = []
 
-    if 'bilibili' in url:
+    if 'youtube' not in url:
         try:
             with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
             count = 0
@@ -60,13 +63,17 @@ def check_queue(ctx, id):
         elif not voice:                 return None
         else:
             cur_info = song_queue[id].pop(0)
-            try:    
-                url = cur_info.watch_url
-                with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
-            except: 
-                info = cur_info['url']
+            try:
+                try:    
+                    url = cur_info.watch_url
+                    with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
+                except: 
+                    info = cur_info['url']
+            except:
+                return None
 
-            temp = {}; temp['info'] = info; temp['time'] = datetime.now()
+            temp = {}; temp['info'] = info; temp['time'] = datetime.now();  temp['status'] = 'playing';
+            temp['pauseTime'] = -1
             current_song[id] = temp
             URL = info['url']
             source = FFmpegPCMAudio(URL, **FFMPEG_OPTIONS)

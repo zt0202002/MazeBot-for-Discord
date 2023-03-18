@@ -23,7 +23,12 @@ def calc_time(time):
 
 def check_time(cur):
     info = cur['info']
+    pauseTime = cur['pauseTime']
     time = cur['time']
+
+    if pauseTime != -1:
+        time += datetime.now() - pauseTime    # 如果有暂停时间，就加上暂停的时间
+
     new_time = timedelta(seconds=info["duration"])
     cur_time = calc_time(time)
     duration = str(new_time).split('.')[0]

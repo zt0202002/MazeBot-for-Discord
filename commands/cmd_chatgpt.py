@@ -3,10 +3,13 @@ import requests, json, discord, logging, sys, signal, asyncio, functools, typing
 #from revChatGPT.Official import Chatbot
 from revChatGPT.V3 import Chatbot
 
+from os.path import exists
 from dotenv import load_dotenv
 from commands import cmd_play, cmd_queue, cmd_join, cmd_current, cmd_resume, cmd_search, cmd_skip
 
 chatbot = {}
+CHAT_CHANNEL_ID = []
+CHAT_MUSIC_ID = []
 
 def split_string_into_chunks(string, chunk_size):
   chunks = []# Create an empty list to store the chunks
@@ -54,6 +57,64 @@ async def get_answer(chatbot,query,id):
         prev_text = data["message"]
     return prev_text
 
+async def load_channel_id():
+    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID
+    chat_file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
+    music_file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
+
+    if exists(chat_file):
+        try: 
+            with open(chat_file, 'r') as f:  CHAT_CHANNEL_ID = json.load(f)
+        except: CHAT_CHANNEL_ID = []
+    else:
+        with open(chat_file, 'w') as f:  json.dump([], f)
+    if exists(music_file):
+        try: 
+            with open(music_file, 'r') as f:  CHAT_MUSIC_ID = json.load(f)
+        except:
+            CHAT_MUSIC_ID = []
+    else:
+        with open(music_file, 'w') as f:  json.dump([], f)
+
+    # turn on chatgpt for specific server
+    await turn_on_chatgpt(963220885706244106)
+    await turn_on_chatgpt(784597124342874122)
+    await turn_on_chatgpt(703476595821903953)
+    await turn_on_chatgpt(1070832939329392713)
+
+async def set_channel(cid, type='chat'):
+    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID
+    if type == 'chat':  file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
+    elif type == 'music':  file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
+    else:   return
+    
+    with open(file, 'w') as f: 
+        try:    CHAT_CHANNEL_ID = json.load(f)
+        except: CHAT_CHANNEL_ID = []
+
+        if cid not in CHAT_CHANNEL_ID and type=='chat':
+            CHAT_CHANNEL_ID.append(cid)
+            json.dump(CHAT_CHANNEL_ID, f)
+        elif cid not in CHAT_MUSIC_ID and type=='music':
+            CHAT_MUSIC_ID.append(cid)
+            json.dump(CHAT_MUSIC_ID, f)
+
+async def remove_channel(cid, type='chat'):
+    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID
+    if type == 'chat':  file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
+    elif type == 'music':  file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
+    else:   return
+    
+    with open(file, 'r') as f: 
+        CHAT_CHANNEL_ID = json.load(f)
+        if cid in CHAT_CHANNEL_ID and type=='chat':
+            if len(CHAT_CHANNEL_ID) == 1: CHAT_CHANNEL_ID = []
+            else:   CHAT_CHANNEL_ID.remove(cid)
+            with open(file, 'w') as f: json.dump(CHAT_CHANNEL_ID, f)
+        elif cid in CHAT_MUSIC_ID and type=='music':
+            if len(CHAT_MUSIC_ID) == 1: CHAT_MUSIC_ID = []
+            else:   CHAT_MUSIC_ID.remove(cid)
+            with open(file, 'w') as f: json.dump(CHAT_MUSIC_ID, f)
 
 async def turn_on_chatgpt(gid, prompt=None):
     load_dotenv()
@@ -72,12 +133,13 @@ async def turn_on_chatgpt(gid, prompt=None):
 
 def turn_off_chatgpt(gid):
     global chatbot
-    chatbot[gid] = None
+    if gid in chatbot:  chatbot[gid] = None
     # return chatbot
 
 def clear_previous_chat_history(chatbot):
     if chatbot.get_max_tokens('default') > 1024: return
     chat_len = len(chatbot.conversation['default'])
+    if chat_len <= 1:   return
     for i in range(chat_len):
         if chatbot.get_max_tokens('default') <= 1536:
             chatbot.conversation['default'].pop(1)
@@ -86,6 +148,8 @@ async def is_music_commands(ctx, bot, msg, response):
     global chatbot
     # check if the message is a music command
     if ('\\') not in response:   return False
+
+    print(response)
 
     # check valid commands
     if '\play' in response:
@@ -106,8 +170,11 @@ async def is_music_commands(ctx, bot, msg, response):
         await cmd_resume.pause(ctx, bot, msg)
     elif '\skip' in response:
         await cmd_skip.skip(ctx, bot, msg)
+    elif '\leave' in response:
+        await cmd_join.leave(ctx, bot, msg)
     else:
         return False
+
 
     music_gpt = chatbot['music']
     music_gpt.reset()

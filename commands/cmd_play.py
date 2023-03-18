@@ -5,7 +5,7 @@ from discord import FFmpegPCMAudio
 # from youtube_dl import YoutubeDL
 from yt_dlp import YoutubeDL
 from help_functions.help_queue import *
-
+from commands.cmd_join import join
 
 async def play(ctx, url, bot, msg = None):
     voice = get(bot.voice_clients, guild=ctx.guild)
@@ -13,8 +13,9 @@ async def play(ctx, url, bot, msg = None):
     except: channel = ctx.author.voice.channel
 
     if voice is None:
-        if msg is None:     await ctx.send(embed=str_not_in_voice_channel); return
-        else:               await msg.edit(content='', embed=str_not_in_voice_channel); return
+        msg = await join(ctx, bot, msg)
+        # if msg is None:     await ctx.send(embed=str_not_in_voice_channel); return
+        # else:               await msg.edit(content='', embed=str_not_in_voice_channel); return
     elif voice.channel != channel:
         if msg is None:     await ctx.send(embed=str_not_in_same_channel);  return
         else:               await msg.edit(content='', embed=str_not_in_same_channel);  return
@@ -70,7 +71,8 @@ async def play_music(ctx, bot, msg, new_song_len):
         # print(cur_info['webpage_url'])
         
 
-        temp = {}; temp['info'] = cur_info; temp['time'] = datetime.now()
+        temp = {}; temp['info'] = cur_info; temp['time'] = datetime.now(); temp['status'] = 'playing'
+        temp['pauseTime'] = -1
         current_song[ctx.guild.id] = temp
         timer = check_time(temp)
         source = FFmpegPCMAudio(cur_info['url'], **FFMPEG_OPTIONS)
@@ -82,7 +84,7 @@ async def play_music(ctx, bot, msg, new_song_len):
     # 如果当前有歌曲播放，且如果只有一首新歌，print出来这首歌的名字和url
     elif new_song_len == 1:
         new_song = song_queue[ctx.guild.id][cur_len - 1]
-        embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len}]\t{new_song.title}\n{new_song.watch_url}', color=0x8B4C39)
+        embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song.title}\n{new_song.watch_url}', color=0x8B4C39)
         await msg.edit(content='', embed=embedVar)
         is_edit_msg = True
     

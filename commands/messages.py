@@ -18,6 +18,9 @@ userdb={}
 ######### Bot Commands #########
 # @bot.event
 async def on_message(message, bot):
+    if message.author == bot.user: return
+    print(chatgpt.CHAT_CHANNEL_ID)
+
     if message.guild is None:
         await bot.process_commands(message)
         return
@@ -33,7 +36,7 @@ async def on_message(message, bot):
 
     if 'music' not in chatbot:    await turn_on_chatgpt('music', 'music')
     
-    if message.content.startswith('.') or message.content.startswith('。'):
+    if message.content.startswith('.') or message.content.startswith('。') or message.channel.id in chatgpt.CHAT_MUSIC_ID:
         music_chat_bot = chatgpt.chatbot['music']
         await send_gpt_msg(message, bot, music_chat_bot)
         return
@@ -75,10 +78,6 @@ async def on_message(message, bot):
         default = 'default'
         await message.channel.send(f'Showing max tokens... [{chatbot.get_max_tokens(default)}]')
         return
-
-    if message.author == bot.user: 
-        await bot.process_commands(message)
-        return
     # if message.channel.id != config["discord_channel"] and type(message.channel)!=discord.DMChannel: return
     
     if message.author.bot:
@@ -86,12 +85,14 @@ async def on_message(message, bot):
         return
     
     # print(message.channel.id)
-    if ((message.channel.id != 1084285046220918864 and message.channel.id != 1084883338873032704 and message.channel.id != 1084945212029276242 and message.channel.id != 1085348253039603772)
+    # if ((message.channel.id != 1084285046220918864 and message.channel.id != 1084883338873032704 and message.channel.id != 1084945212029276242 and message.channel.id != 1085348253039603772)
+    
+    if ((did not in chatgpt.CHAT_CHANNEL_ID)
         and not message.content.startswith('!') and not message.content.startswith('！')
         and not message.content.startswith(';') and not message.content.startswith('；')): 
         await bot.process_commands(message)
         return
-    
+        
     # if message.content == '!refresh': chatbot.refresh_session(); await message.add_reaction("🔄"); print("refresh session"); return
     # if message.content == '!restart' and message.author.id == config['discord_admin_id']: os.execl(__file__, *sys.argv);return
     if message.content == '!reset': chatbot.reset();await message.add_reaction("💪"); print("reset chat"); return

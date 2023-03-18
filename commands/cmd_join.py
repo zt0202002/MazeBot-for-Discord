@@ -13,10 +13,12 @@ async def join(ctx, bot, msg=None):
         voice = await channel.connect()
 
     if msg is None:
-        await ctx.defer(ephemeral=True)
-        await ctx.reply(embed=str_join_channel)
+        # await ctx.defer(ephemeral=True)
+        msg = await ctx.reply(embed=str_join_channel)
     else:
-        await msg.edit(content = '', embed=str_join_channel)
+        msg = await msg.edit(content = '', embed=str_join_channel)
+    
+    return msg
 
 async def leave(ctx, bot, msg=None):
     voice = get(bot.voice_clients, guild=ctx.guild)

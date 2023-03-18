@@ -24,6 +24,7 @@ from datetime import datetime
 
 from commands import messages, test_slash, cmd_join, cmd_play, cmd_search, cmd_queue, cmd_current, cmd_delete
 from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random, cmd_minecraft, cmd_chatgpt
+from commands import cmd_reaction
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -41,6 +42,8 @@ class Bot(commands.Bot):
             # await self.tree.sync(guild = discord.Object(id=ids[1])) #guild specific: leave blank if global (global registration can take 1-24 hours)
             await self.tree.sync()
             self.synced = True
+            await cmd_chatgpt.load_channel_id()
+
         print(f"We have logged in as {self.user}.")
 
     # async def on_command_error(self, ctx, error):
@@ -55,6 +58,9 @@ async def on_message(message):  await messages.on_message(message, bot)
 
 @bot.event
 async def on_voice_state_update(member, before, after): await cmd_join.on_voice_state_update(member, before, after, bot)
+
+@bot.event
+async def on_reaction_add(reaction, user):  await cmd_reaction.reply_reaction(reaction, user, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'test', description='testing') #guild specific slash command
 @commands.has_permissions(administrator=True)
@@ -139,4 +145,25 @@ async def chatgpt_off(ctx):
     await cmd_chatgpt.turn_off_chatgpt(ctx.guild.id)
     await ctx.send("关闭聊天功能！")
 
-bot.run(os.getenv('TOKEN'))
+@bot.hybrid_command(with_app_command=True, name = 'set_chat_channel', description=dp.chatgptChatChannel) #guild specific slash command
+async def chatgpt_channel(ctx, channel: discord.TextChannel):
+    await cmd_chatgpt.set_channel(channel.id, 'chat')
+    await ctx.send(f"将{channel.name}设置为聊天频道，可以和我愉快聊天啦！")
+
+@bot.hybrid_command(with_app_command=True, name = 'set_music_channel', description=dp.chatgptMusicChannel) #guild specific slash command
+async def chatgpt_channel(ctx, channel: discord.TextChannel):
+    await cmd_chatgpt.set_channel(channel.id, 'music')
+    await ctx.send(f"将{channel.name}设置为音乐频道，可以无需指令放歌啦！")
+
+@bot.hybrid_command(with_app_command=True, name = 'delete_chat_channel', description=dp.chatgptChatChannelDelete) #guild specific slash command
+async def chatgpt_channel(ctx, channel: discord.TextChannel):
+    await cmd_chatgpt.remove_channel(channel.id, 'chat')
+    await ctx.send(f"已关闭自动聊天功能！")
+
+@bot.hybrid_command(with_app_command=True, name = 'delete_music_channel', description=dp.chatgptMusicChannelDelete) #guild specific slash command
+async def chatgpt_channel(ctx, channel: discord.TextChannel):
+    await cmd_chatgpt.remove_channel(channel.id, 'music')
+    await ctx.send(f"已关闭无指令点歌功能！")
+
+
+bot.run(os.getenv('TOKEN2'))
