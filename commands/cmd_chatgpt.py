@@ -88,16 +88,16 @@ async def set_channel(cid, type='chat'):
     elif type == 'music':  file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
     else:   return
     
-    with open(file, 'w') as f: 
+    with open(file, 'r') as f: 
         try:    CHAT_CHANNEL_ID = json.load(f)
         except: CHAT_CHANNEL_ID = []
 
         if cid not in CHAT_CHANNEL_ID and type=='chat':
             CHAT_CHANNEL_ID.append(cid)
-            json.dump(CHAT_CHANNEL_ID, f)
+            with open(file, 'w') as f: json.dump(CHAT_CHANNEL_ID, f)
         elif cid not in CHAT_MUSIC_ID and type=='music':
             CHAT_MUSIC_ID.append(cid)
-            json.dump(CHAT_MUSIC_ID, f)
+            with open(file, 'w') as f: json.dump(CHAT_MUSIC_ID, f)
 
 async def remove_channel(cid, type='chat'):
     global CHAT_CHANNEL_ID, CHAT_MUSIC_ID

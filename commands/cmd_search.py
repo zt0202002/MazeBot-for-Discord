@@ -29,6 +29,7 @@ async def search(ctx, request, bot, msg=None):
     with YoutubeDL(YDL_OPTIONS) as ydl:
         try:
             info = ydl.extract_info(f"ytsearch:{request}", download=False)['entries'][0]
+            
         except:
             info = ydl.extract_info(request, download=False)
         
