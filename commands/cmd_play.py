@@ -78,19 +78,22 @@ async def play_music(ctx, bot, msg, new_song_len):
         source = FFmpegPCMAudio(cur_info['url'], **FFMPEG_OPTIONS)
         voice.play(source, after=lambda x=0: check_queue(ctx, ctx.guild.id))
         embedVar = discord.Embed(title=f'我来播放这首歌了捏！', description=f'{cur_info["title"]}\n[{timer[0]}/{timer[1]}]\n{cur_info["webpage_url"]}', color=0x8B4C39)
-        await msg.edit(content='', embed=embedVar)
+        
+        if msg is None: await ctx.channel.send(embed=embedVar)
+        else:           await msg.edit(content='', embed=embedVar)
         is_edit_msg = True
     
     # 如果当前有歌曲播放，且如果只有一首新歌，print出来这首歌的名字和url
     elif new_song_len == 1:
         new_song = song_queue[ctx.guild.id][cur_len - 1]
         embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song.title}\n{new_song.watch_url}', color=0x8B4C39)
-        await msg.edit(content='', embed=embedVar)
+        if msg is None: await ctx.channel.send(embed=embedVar)
+        else:           await msg.edit(content='', embed=embedVar)
         is_edit_msg = True
     
     # 如果新加入的歌不只一首，print出来专辑中的歌的数量
     if new_song_len > 1:
         # embedVar = discord.Embed(title=f'专辑{info["title"]}中的{len(info["entries"])}首歌加入到播放列表了捏！', description="", color=0x8B4C39)
         embedVar = discord.Embed(title=f'已经将{new_song_len}首歌加入到播放列表了捏！', description="", color=0x8B4C39)
-        if is_edit_msg: await msg.channel.send(content = '', embed=embedVar)
+        if is_edit_msg or msg is None: await ctx.channel.send(embed=embedVar)
         else:           await msg.edit(content='', embed=embedVar)

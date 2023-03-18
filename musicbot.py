@@ -166,4 +166,4 @@ async def chatgpt_channel(ctx, channel: discord.TextChannel):
     await ctx.send(f"已关闭无指令点歌功能！")
 
 
-bot.run(os.getenv('TOKEN2'))
+bot.run(os.getenv('TOKEN'))

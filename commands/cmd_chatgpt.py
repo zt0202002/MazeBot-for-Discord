@@ -10,6 +10,7 @@ from commands import cmd_play, cmd_queue, cmd_join, cmd_current, cmd_resume, cmd
 chatbot = {}
 CHAT_CHANNEL_ID = []
 CHAT_MUSIC_ID = []
+CHAT_GID = []
 
 def split_string_into_chunks(string, chunk_size):
   chunks = []# Create an empty list to store the chunks
@@ -58,9 +59,10 @@ async def get_answer(chatbot,query,id):
     return prev_text
 
 async def load_channel_id():
-    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID
+    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID
     chat_file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
     music_file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
+    gid_file = f'./QueueLog/ChatGPTChannel/chatserver.json'
 
     if exists(chat_file):
         try: 
@@ -76,33 +78,48 @@ async def load_channel_id():
     else:
         with open(music_file, 'w') as f:  json.dump([], f)
 
+    if exists(gid_file):
+        try: 
+            with open(gid_file, 'r') as f:  CHAT_GID = json.load(f)
+        except:
+            CHAT_GID = []
+    else:
+        with open(gid_file, 'w') as f:  json.dump([], f)
+
     # turn on chatgpt for specific server
-    await turn_on_chatgpt(963220885706244106)
-    await turn_on_chatgpt(784597124342874122)
-    await turn_on_chatgpt(703476595821903953)
-    await turn_on_chatgpt(1070832939329392713)
+    # await turn_on_chatgpt(963220885706244106)
+    # await turn_on_chatgpt(784597124342874122)
+    # await turn_on_chatgpt(703476595821903953)
+    # await turn_on_chatgpt(1070832939329392713)
 
 async def set_channel(cid, type='chat'):
-    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID
+    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID
     if type == 'chat':  file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
     elif type == 'music':  file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
+    elif type == 'server':  file = f'./QueueLog/ChatGPTChannel/chatserver.json'
     else:   return
     
     with open(file, 'r') as f: 
-        try:    CHAT_CHANNEL_ID = json.load(f)
-        except: CHAT_CHANNEL_ID = []
+        try:    CHAT_ID = json.load(f)
+        except: CHAT_ID = []
 
-        if cid not in CHAT_CHANNEL_ID and type=='chat':
-            CHAT_CHANNEL_ID.append(cid)
+        if cid not in CHAT_ID:  CHAT_ID.append(cid)
+
+        if type=='chat':   
+            CHAT_CHANNEL_ID = CHAT_ID
             with open(file, 'w') as f: json.dump(CHAT_CHANNEL_ID, f)
-        elif cid not in CHAT_MUSIC_ID and type=='music':
-            CHAT_MUSIC_ID.append(cid)
+        elif type=='music':
+            CHAT_MUSIC_ID = CHAT_ID
             with open(file, 'w') as f: json.dump(CHAT_MUSIC_ID, f)
+        elif type=='server':
+            CHAT_GID = CHAT_ID
+            with open(file, 'w') as f: json.dump(CHAT_GID, f)
 
 async def remove_channel(cid, type='chat'):
-    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID
+    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID
     if type == 'chat':  file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
     elif type == 'music':  file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
+    elif type == 'server':  file = f'./QueueLog/ChatGPTChannel/chatserver.json'
     else:   return
     
     with open(file, 'r') as f: 
@@ -115,6 +132,10 @@ async def remove_channel(cid, type='chat'):
             if len(CHAT_MUSIC_ID) == 1: CHAT_MUSIC_ID = []
             else:   CHAT_MUSIC_ID.remove(cid)
             with open(file, 'w') as f: json.dump(CHAT_MUSIC_ID, f)
+        elif cid in CHAT_GID and type=='server':
+            if len(CHAT_GID) == 1: CHAT_GID = []
+            else:   CHAT_GID.remove(cid)
+            with open(file, 'w') as f: json.dump(CHAT_GID, f)
 
 async def turn_on_chatgpt(gid, prompt=None):
     load_dotenv()
@@ -130,10 +151,14 @@ async def turn_on_chatgpt(gid, prompt=None):
         chatbot[gid] = Chatbot(api_key=key, max_tokens=2048, system_prompt=prompt)
         return
     chatbot[gid] = Chatbot(api_key=key, max_tokens=3096, system_prompt=prompt)
+    await set_channel(gid, 'server')
 
-def turn_off_chatgpt(gid):
-    global chatbot
-    if gid in chatbot:  chatbot[gid] = None
+async def turn_off_chatgpt(gid):
+    global chatbot, CHAT_GID
+    print(CHAT_GID)
+    if gid in CHAT_GID:  
+        chatbot[gid] = None
+        await remove_channel(gid, 'server')
     # return chatbot
 
 def clear_previous_chat_history(chatbot):

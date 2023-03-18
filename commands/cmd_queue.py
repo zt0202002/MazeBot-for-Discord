@@ -24,6 +24,7 @@ async def queue(ctx, bot, msg=None):
 
     await add_emoji_options(msg)
 
+    """
     # emoji = getEmoteFromName(":ok:")
     # no = getEmoteFromName(":no_entry_sign:")
     # await msg.add_reaction(emoji)
@@ -52,6 +53,7 @@ async def queue(ctx, bot, msg=None):
     # no = getEmoteFromName(":no_entry_sign:")
     # await msg.add_reaction(emoji)
     # await msg.add_reaction(no)
+    """
 
 async def add_emoji_options(msg):
     await msg.clear_reactions()
@@ -103,19 +105,20 @@ async def convert_queue_to_embed(ctx, queue_list, start, end=NEXT_PAGE):
 
     status = '正在播放' if queue_list[0]['status'] == 'playing' else '已暂停'
 
+    embedVar = discord.Embed(title=f'Current Playlist', description="", color=0x8B4C39)
+
     if len(queue) == 0 and current is not None:
-        embedVar = discord.Embed(title=f'当前列表:\n[1] {current["title"]} [{timer[0]}/{timer[1]}] [{status}]\n', description=f'', color=0x487B60)
+        embedVar.add_field(name=f'**[1] {current["title"]} [{timer[0]}|{timer[1]}] [{status}]**', value=f'', inline=False)
     else:
         queue_list = ''
+        if current is not None:
+            embedVar.add_field(name=f'**[1] {current["title"]} [{timer[0]}|{timer[1]}] [{status}]**', value=f'', inline=False)
         for i in range(len(queue)):
-            try:    
-                try:    queue_list += f'[{start+i+1}]\t {queue[i].title}\n'
-                except: queue_list += f'[{start+i+1}]\t {queue[i]["title"]}\n'
-            except: queue_list += f'[{start+i+1}]\t Error Title\n'
-        if current is None:
-            embedVar = discord.Embed(title=f'当前列表:\n', description=f'{queue_list}', color=0x487B60)
-        else:
-            embedVar = discord.Embed(title=f'当前列表:\n[1] {current["title"]} [{timer[0]}/{timer[1]}] [{status}]\n', description=f'{queue_list}', color=0x487B60)
+            try:
+                try:    embedVar.add_field(name=f'**[{start+i+1}] {queue[i].title}**', value=f'', inline=False)
+                except: embedVar.add_field(name=f'**[{start+i+1}] {queue[i]["title"]}**', value=f'', inline=False)
+            except:
+                embedVar.add_field(name=f'**f[{start+i+1}]\t Error Title\n**', value=f'', inline=False)
     return embedVar
 
 async def load_queue(msg):

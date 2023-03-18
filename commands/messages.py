@@ -40,8 +40,10 @@ async def on_message(message, bot):
         music_chat_bot = chatgpt.chatbot['music']
         await send_gpt_msg(message, bot, music_chat_bot)
         return
-
-    if gid not in chatbot or chatbot[gid] is None:
+    
+    if gid in CHAT_GID and gid not in chatbot:
+        await turn_on_chatgpt(gid)
+    elif gid not in chatbot or chatbot[gid] is None:
         if message.content.startswith(';;on'):
             await message.channel.send('Starting chatbot...')
             await turn_on_chatgpt(gid)
