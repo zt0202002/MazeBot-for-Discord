@@ -41,7 +41,7 @@ async def on_message(message, bot):
         await send_gpt_msg(message, bot, music_chat_bot)
         return
     
-    if gid in CHAT_GID and gid not in chatbot:
+    if gid in chatgpt.CHAT_GID and gid not in chatbot:
         await turn_on_chatgpt(gid)
     elif gid not in chatbot or chatbot[gid] is None:
         if message.content.startswith(';;on'):
