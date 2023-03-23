@@ -180,18 +180,18 @@ async def is_music_commands(ctx, bot, msg, response):
     print(response)
 
     # check valid commands
-    if '\play' in response:
+    if '\play' == response:
         url = response.split(' ')[1]
         await cmd_play.play(ctx, url, bot, msg)
-    elif '\join' in response:
+    elif '\join' == response:
         await cmd_join.join(ctx, bot, msg)
-    elif '\queue' in response:
+    elif '\queue' == response:
         await cmd_queue.queue(ctx, bot, msg)
-    elif '\current' in response:
+    elif '\current' == response:
         await cmd_current.current(ctx, bot, msg)
-    elif '\\resume' in response:
+    elif '\\resume' == response:
         await cmd_resume.resume(ctx, bot, msg)
-    elif '\search' in response:
+    elif '\search' == response.split(' ', 1)[0] and len(response.split(' ', 1)) > 1:
         content = response.split(' ', 1)[1]
         await cmd_search.search(ctx, content, bot, msg)
     elif '\pause' in response:

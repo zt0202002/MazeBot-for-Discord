@@ -30,7 +30,7 @@ class CurrentButton(discord.ui.View):
         embedvar = await current(interaction, interaction.client, interaction.message)
         await interaction.response.edit_message(content = '', embed=embedvar, view=self)
 
-async def current(ctx, bot, msg=None):
+async def current(ctx, bot, msg=None, gpt=False):
     voice = get(bot.voice_clients, guild=ctx.guild)
     # if ctx.guild.id not in current_song or (not voice.is_playing() or current_song[ctx.guild.id] == {}:
     if ctx.guild.id not in current_song or current_song[ctx.guild.id] == {}:
@@ -43,6 +43,8 @@ async def current(ctx, bot, msg=None):
     
     if msg is None:
         msg = await ctx.send(embed=embedVar, view=CurrentButton())
+    if gpt and msg is not None:
+        await msg.edit(content = '', embed=embedVar, view=CurrentButton())
 
     return embedVar
 
