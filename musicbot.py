@@ -22,6 +22,8 @@ from help_functions.help_queue import *
 
 from datetime import datetime
 
+from concurrent.futures import ThreadPoolExecutor
+
 from commands import messages, test_slash, cmd_join, cmd_play, cmd_search, cmd_queue, cmd_current, cmd_delete
 from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random, cmd_minecraft, cmd_chatgpt
 from commands import cmd_reaction
@@ -54,7 +56,10 @@ class Bot(commands.Bot):
 bot = Bot()
 
 @bot.event
-async def on_message(message):  await messages.on_message(message, bot)
+async def on_message(message):  
+    # loop = asyncio.get_event_loop()
+    # await asyncio.create_task(messages.on_message(message, bot))
+    await messages.on_message(message, bot)
 
 @bot.event
 async def on_voice_state_update(member, before, after): await cmd_join.on_voice_state_update(member, before, after, bot)

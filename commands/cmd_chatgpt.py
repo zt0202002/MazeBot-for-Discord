@@ -48,7 +48,10 @@ def tidy_response(i):# Optionally spoilerify or hide the most repetitive annoyin
 
 # @to_thread
 async def get_answer(chatbot,query,id):
-    response = chatbot.ask(query,user=id)
+    try:
+        response = await asyncio.wait_for(asyncio.to_thread(chatbot.ask,query,user=id), timeout=30)
+    except asyncio.TimeoutError:
+        return "Timeout!"
     return response
     prev_text = ""
     for data in chatbot.ask(query):
