@@ -9,3 +9,4 @@ report.txt
 test.py
 .empty
 /QueueLog/**/*.json
+*.json
