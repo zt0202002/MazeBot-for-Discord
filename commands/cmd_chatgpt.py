@@ -155,7 +155,7 @@ async def turn_on_chatgpt(gid, prompt=None):
 
 async def turn_off_chatgpt(gid):
     global chatbot, CHAT_GID
-    print(CHAT_GID)
+    # print(CHAT_GID)
     if gid in CHAT_GID:  
         chatbot[gid] = None
         await remove_channel(gid, 'server')

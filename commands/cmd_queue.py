@@ -3,10 +3,65 @@ from help_functions.help_text import *
 from help_functions.help_time import *
 from help_functions.help_queue import *
 from discordhelp import getEmoteFromName
+from commands.cmd_resume import *
+from commands.cmd_skip import *
 
 QUEUE_INDEX = {}
 QUEUE_ID = []
 NEXT_PAGE = 5
+
+class QueueButton(discord.ui.View):
+    global QUEUE_INDEX, QUEUE_ID, NEXT_PAGE
+
+    def get_msg(self, interaction):
+        gid = interaction.guild.id
+        index = QUEUE_INDEX[gid]
+        return gid, index
+
+    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary)
+    async def prev_button_callback(self, interaction, button):
+        gid, index = self.get_msg(interaction)
+        queue_list = await load_queue(interaction)
+
+        if index - NEXT_PAGE < 0:   index = 0
+        else:   index -= NEXT_PAGE
+
+        await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
+
+    @discord.ui.button(label="Play | Paus", row=0, style=discord.ButtonStyle.primary)
+    async def resume_button_callback(self, interaction, button):
+        gid, index = self.get_msg(interaction)
+        button = await resume(interaction, interaction.client, interaction.message)
+        if button is False: await pause(interaction, interaction.client, interaction.message)
+
+        # await asyncio.sleep(0.5)
+        queue_list = await load_queue(interaction)
+        await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
+
+    @discord.ui.button(label="Skip", row=0, style=discord.ButtonStyle.primary)
+    async def skip_button_callback(self, interaction, button):
+        gid, index = self.get_msg(interaction)
+        await skip(interaction, interaction.client, interaction.message)
+
+        # await asyncio.sleep(0.5)
+        queue_list = await load_queue(interaction)
+        await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
+
+    @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary)
+    async def next_button_callback(self, interaction, button):
+        gid, index = self.get_msg(interaction)
+        queue_list = await load_queue(interaction)
+
+        if index + NEXT_PAGE > len(queue_list):   index = len(queue_list) - NEXT_PAGE
+        else:   index += NEXT_PAGE
+
+        await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
+
+    @discord.ui.button(label="Load", row=0, style=discord.ButtonStyle.success)
+    async def refresh_button_callback(self, interaction, button):
+        gid, index = self.get_msg(interaction)
+        queue_list = await load_queue(interaction)
+        await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
 
 async def queue(ctx, bot, msg=None):
     global QUEUE_INDEX
@@ -17,12 +72,15 @@ async def queue(ctx, bot, msg=None):
     if msg is None: msg = await ctx.send(embed=cur)
 
     queue_list = await load_queue(msg)
-    await msg.edit(content = '', embed=await convert_queue_to_embed(ctx, queue_list, 0))
 
-    QUEUE_INDEX[msg.id] = 0
-    if msg.id not in QUEUE_ID:  QUEUE_ID.append(msg.id)
+    QUEUE_INDEX[ctx.guild.id] = 0
+    if ctx.guild.id not in QUEUE_ID:  QUEUE_ID.append(ctx.guild.id)
 
-    await add_emoji_options(msg)
+    await msg.edit(content = '', embed=await convert_queue_to_embed(ctx, queue_list, 0), view=QueueButton())
+
+    
+
+    # await add_emoji_options(msg)
 
     """
     # emoji = getEmoteFromName(":ok:")

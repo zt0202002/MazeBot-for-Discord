@@ -2,8 +2,8 @@ from discord.utils import get
 from help_functions.help_text import *
 from help_functions.help_time import *
 from help_functions.help_queue import *
-from commands.cmd_queue import update_queue, QUEUE_ID
-from commands.cmd_current import current, CURRENT_ID
+# from commands.cmd_queue import update_queue, QUEUE_ID
+# from commands.cmd_current import current, CURRENT_ID
 import asyncio
 
 async def skipall(ctx, bot):
@@ -51,18 +51,10 @@ async def skip(ctx, bot, msg=None):
         elif len(song_queue[ctx.guild.id]) != 0:
             info = song_queue[ctx.guild.id][0]
             embedVar = discord.Embed(title=f'我来播放这首歌了捏！', description=f'{info.title}\n{info.watch_url}', color=0x8B4C39)
-            
         else:
             embedVar = str_no_song_next
     else:
         embedVar = str_not_song_playing
     
-    if msg is not None and msg.id in QUEUE_ID:
-        await asyncio.sleep(1)
-        await update_queue(msg, 'skip')
-    elif msg is not None and msg.id in CURRENT_ID:
-        await current(ctx, bot, msg)
-    elif msg is None:
-        await ctx.send(embed=embedVar)
-    else:
-        await msg.edit(content = '', embed=embedVar)
+    if msg is None: await ctx.send(embed=embedVar)
+    return

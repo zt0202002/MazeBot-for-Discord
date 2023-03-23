@@ -6,6 +6,7 @@ from discord import FFmpegPCMAudio
 from yt_dlp import YoutubeDL
 from help_functions.help_queue import *
 from commands.cmd_join import join
+from discord import Message
 
 async def play(ctx, url, bot, msg = None):
     voice = get(bot.voice_clients, guild=ctx.guild)
@@ -51,7 +52,11 @@ async def play(ctx, url, bot, msg = None):
 
 
 async def play_music(ctx, bot, msg, new_song_len):
-    voice = get(bot.voice_clients, guild=ctx.guild)
+    # voice = get(bot.voice_clients, guild=ctx.guild)
+    if isinstance(ctx, Message):
+        voice = ctx.guild.voice_client
+    else:
+        voice = ctx.message.guild.voice_client
     
     cur_len = len(song_queue[ctx.guild.id])
     is_edit_msg = False

@@ -12,9 +12,11 @@ async def join(ctx, bot, msg=None):
     else:
         voice = await channel.connect()
 
+    print('connected to voice channel')
+
     if msg is None:
         # await ctx.defer(ephemeral=True)
-        msg = await ctx.reply(embed=str_join_channel)
+        msg = await ctx.send(embed=str_join_channel)
     else:
         msg = await msg.edit(content = '', embed=str_join_channel)
     
