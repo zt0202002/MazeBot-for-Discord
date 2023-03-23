@@ -175,7 +175,8 @@ async def send_gpt_msg(message, bot, cb, longquery=''):
     r=tidy_response(response)
     chunks=split_string_into_chunks(r,1975) # Make sure response chunks fit inside a discord message (max 2k characters)
     for chunk in chunks:
-        await msg.edit(content=chunk)
+        if chunk == chunks[0]:  await msg.edit(content=chunk)
+        else:  await message.channel.send(chunk)
     return
 
     try:

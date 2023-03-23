@@ -165,7 +165,7 @@ async def turn_off_chatgpt(gid):
     # return chatbot
 
 def clear_previous_chat_history(chatbot):
-    if chatbot.get_max_tokens('default') > 1024: return
+    if chatbot.get_max_tokens('default') > 1536: return
     chat_len = len(chatbot.conversation['default'])
     if chat_len <= 1:   return
     for i in range(chat_len):
@@ -180,7 +180,7 @@ async def is_music_commands(ctx, bot, msg, response):
     print(response)
 
     # check valid commands
-    if '\play' == response:
+    if '\play' == response.split(' ')[0]:
         url = response.split(' ')[1]
         await cmd_play.play(ctx, url, bot, msg)
     elif '\join' == response:
@@ -188,11 +188,11 @@ async def is_music_commands(ctx, bot, msg, response):
     elif '\queue' == response:
         await cmd_queue.queue(ctx, bot, msg)
     elif '\current' == response:
-        await cmd_current.current(ctx, bot, msg)
+        await cmd_current.current(ctx, bot, msg, True)
     elif '\\resume' == response:
         await cmd_resume.resume(ctx, bot, msg)
-    elif '\search' == response.split(' ', 1)[0] and len(response.split(' ', 1)) > 1:
-        content = response.split(' ', 1)[1]
+    elif '\search' == response.split(' ')[0] and len(response.split(' ')) > 1:
+        content = response.split(' ')[1]
         await cmd_search.search(ctx, content, bot, msg)
     elif '\pause' in response:
         await cmd_resume.pause(ctx, bot, msg)
