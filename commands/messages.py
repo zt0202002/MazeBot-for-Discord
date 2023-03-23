@@ -21,8 +21,6 @@ async def on_message(message, bot, interaction=None):
     if message.author == bot.user: return
     print(chatgpt.CHAT_CHANNEL_ID)
 
-    interaction.response.defer(thinking=True)
-
     if message.guild is None:
         await bot.process_commands(message)
         return
