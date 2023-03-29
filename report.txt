@@ -8,3 +8,6 @@
 [2023-03-16 08:49:42.920530] MazeCharmZzt#2964 reported: dearly beloved but not the kh2 and kh1 version , dearly beloved but not from the kh2 and kh1 version
 [2023-03-16 09:01:34.018275] MazeCharmZzt#2964 reported: /leave没写
 [2023-03-16 19:12:58.552898] MazeCharmZzt#2964 reported: https://www.bilibili.com/video/BV1gq4y167mq?p=2&vd_source=f4f0625700704ee55dbbb245935f017a
+[2023-03-29 06:13:27.553590] MazeCharmZzt#2964 reported: 设久一点chatgpt的waiting时间
+[2023-03-29 07:57:04.943648] MazeCharmZzt#2964 reported: 遇到无效歌曲自动跳过的功能
+[2023-03-29 08:01:09.010691] MazeCharmZzt#2964 reported: https://stackoverflow.com/questions/68209379/error-in-the-pull-function-keepalive-request-failed-for-when-opening-url
