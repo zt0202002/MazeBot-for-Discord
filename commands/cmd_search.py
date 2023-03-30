@@ -73,7 +73,13 @@ class SeachButton(discord.ui.View):
     async def fifth_button_callback(self, interaction, button):
         msg_id, infos, index = self.get_msg(interaction)
         
-        watch_url = infos[index+4].watch_url
+        try:
+            watch_url = infos[index+4].watch_url
+        except:
+            embedVar = discord.Embed(title="Error", description="Loading video failed, please try again", color=0x00ff00)
+            interaction.response.send_message(content = '', embed=embedVar)
+            await interaction.response.edit_message(content = '', embed=queue_list_embed, view=self)
+            return
         await addToQueue(interaction.guild, url = watch_url)
         await play_music(interaction, interaction.client, None, 1)
 
@@ -134,6 +140,7 @@ async def search(ctx, request, bot, msg=None):
     SEARCH_ID.append(msg.id)
     
     search_results = Search(request).results
+
     SEARCH_QUEUE[msg.id] = search_results
     SEARCH_INDEX[msg.id] = 0
 

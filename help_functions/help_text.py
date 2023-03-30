@@ -16,7 +16,7 @@ YDL_OPTIONS = {
         'source_address': '0.0.0.0',
         'max-downloads': 10
     }
-FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 ', 'options': '-vn -http_persistent 0'}
 
 str_not_in_voice_channel = discord.Embed(title="你都不在频道！你让我来干嘛！快输入/join让我来你的频道！", description="", color=0xD0B8A0)
 str_not_in_same_channel = discord.Embed(title="我都不在你的频道！你让我来干嘛！快输入/join让我来你的频道！", description="", color=0xD0B8A0)

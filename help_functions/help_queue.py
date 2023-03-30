@@ -62,17 +62,19 @@ def check_queue(ctx, id):
         if len(song_queue[id]) == 0:    return None
         elif not voice:                 return None
         else:
-            cur_info = song_queue[id].pop(0)
-            try:
-                try:    
-                    url = cur_info.watch_url
-                    with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
-                except: 
-                    info = cur_info['url']
-            except:
-                return None
+            while True:
+                try:
+                    cur_info = song_queue[id].pop(0)
+                    try:    
+                        url = cur_info.watch_url
+                        with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
+                    except: 
+                        info = cur_info['url']
+                    break
+                except:
+                    continue
 
-            temp = {}; temp['info'] = info; temp['time'] = datetime.now();  temp['status'] = 'playing';
+            temp = {}; temp['info'] = info; temp['time'] = datetime.now();  temp['status'] = 'playing'
             temp['pauseTime'] = -1
             current_song[id] = temp
             URL = info['url']

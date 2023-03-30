@@ -19,7 +19,7 @@ userdb={}
 # @bot.event
 async def on_message(message, bot, interaction=None):
     if message.author == bot.user: return
-    print(chatgpt.CHAT_CHANNEL_ID)
+    # print(chatgpt.CHAT_CHANNEL_ID)
 
     if message.guild is None:
         await bot.process_commands(message)
@@ -40,6 +40,17 @@ async def on_message(message, bot, interaction=None):
         music_chat_bot = chatgpt.chatbot['music']
         await send_gpt_msg(message, bot, music_chat_bot)
         return
+    
+    if message.channel.type == discord.ChannelType.private_thread or message.channel.type == discord.ChannelType.public_thread:
+        thread = message.channel
+        thread_id = str(thread.id)
+
+        if thread_id in chatgpt.CHAT_THREAD_ID and thread_id not in chatbot:
+            await turn_on_chatgpt(thread_id, 'thread', None, chatgpt.CHAT_THREAD_ID[thread_id])
+
+        if thread_id in chatbot and chatbot[thread_id] is not None:
+            await send_gpt_msg(message, bot, chatbot[thread_id])
+            return
     
     if gid in chatgpt.CHAT_GID and gid not in chatbot:
         await turn_on_chatgpt(gid)
@@ -103,24 +114,6 @@ async def on_message(message, bot, interaction=None):
         return
     
     longquery=''
-    # if message.content.startswith(';;'):
-    #     authperm=message.content[2:]
-    #     print(authperm)
-    #     author=authperm.split("/")[0]
-    #     permlink=authperm.split("/")[1].split(' ')[0].split('\n')[0]
-    #     headers={
-    #         "id":2,
-    #         "jsonrpc":"2.0",
-    #         "method":"condenser_api.get_content",
-    #         "params": ["{}".format(author), "{}".format(permlink)]
-    #     }
-    #     response=requests.post("https://api.hive.blog/",json=headers)
-    #     post=json.loads(response.text)
-    #     post=post['result']
-    #     body=post['body']
-    #     title=post['title']
-    #     longquery=title+'\n'+body
-    #     print('attaching hive post '+author+'/'+permlink+' : '+title)
     if message.attachments and message.attachments[0].width and message.attachments[0].height:
         #image_url = message.attachments[0].proxy_url
         #image_desc = extract_text_from_image_url(image_url)
@@ -137,76 +130,32 @@ async def on_message(message, bot, interaction=None):
     print(message.author.name+':'+message.content)
 
     await send_gpt_msg(message, bot, chatbot, longquery)
-    # cid=None
-    
-    # print(did)
-    # cb=chatbot
-    # if did in userdb:
-    #     cid=userdb[message.channel.id]
-    # else:
-    #     cid=None
-
 
 async def send_gpt_msg(message, bot, cb, longquery=''):
-    did=str(message.channel.id)
-
-    clear_previous_chat_history(cb)
-    msg = await message.reply('Thinking...')
-    query=message.content
-    if longquery and longquery != '':
-        query=message.content+'\n```'+longquery+'\n```'
-    # if isinstance(message.channel,discord.channel.DMChannel) and config["dm"]=="False":#DM, and DM's not disabled in config
-    #     await message.reply("Direct messages have been disabled")
-    #     return
-    else:#In channel
-        async with message.channel.typing():
-            if message.content.startswith('.') or message.content.startswith('。'):
-                response=await get_answer(chatbot['music'],query,did)
-            else:
-                response=await get_answer(cb,query,did)
-    #userdb[did]={'cid':response['conversation_id']}
-    #print(userdb)
-    # print(response)
-    # print('ai:'+response["choices"][0]["text"]) #official
-    #r=tidy_response(response["choices"][0]["text"]) #unofficial
-
-    if await is_music_commands(message, bot, msg, response):  return
-
-    r=tidy_response(response)
-    chunks=split_string_into_chunks(r,1975) # Make sure response chunks fit inside a discord message (max 2k characters)
-    for chunk in chunks:
-        if chunk == chunks[0]:  await msg.edit(content=chunk)
-        else:  await message.channel.send(chunk)
-    return
-
     try:
+        did=str(message.channel.id)
+
         clear_previous_chat_history(cb)
         msg = await message.reply('Thinking...')
         query=message.content
         if longquery and longquery != '':
             query=message.content+'\n```'+longquery+'\n```'
-        # if isinstance(message.channel,discord.channel.DMChannel) and config["dm"]=="False":#DM, and DM's not disabled in config
-        #     await message.reply("Direct messages have been disabled")
-        #     return
+
         else:#In channel
             async with message.channel.typing():
                 if message.content.startswith('.') or message.content.startswith('。'):
                     response=await get_answer(chatbot['music'],query,did)
                 else:
                     response=await get_answer(cb,query,did)
-        #userdb[did]={'cid':response['conversation_id']}
-        #print(userdb)
-        # print(response)
-        # print('ai:'+response["choices"][0]["text"]) #official
-        #r=tidy_response(response["choices"][0]["text"]) #unofficial
 
         if await is_music_commands(message, bot, msg, response):  return
 
         r=tidy_response(response)
         chunks=split_string_into_chunks(r,1975) # Make sure response chunks fit inside a discord message (max 2k characters)
         for chunk in chunks:
-            await msg.edit(content=chunk)
-        
+            if chunk == chunks[0]:  await msg.edit(content=chunk)
+            else:  await message.channel.send(chunk)
+            
     except Exception as e:
         print("Something went wrong!")
         error=(str(e))

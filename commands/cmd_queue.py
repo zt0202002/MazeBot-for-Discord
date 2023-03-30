@@ -18,16 +18,6 @@ class QueueButton(discord.ui.View):
         index = QUEUE_INDEX[gid]
         return gid, index
 
-    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary)
-    async def prev_button_callback(self, interaction, button):
-        gid, index = self.get_msg(interaction)
-        queue_list = await load_queue(interaction)
-
-        if index - NEXT_PAGE < 0:   index = 0
-        else:   index -= NEXT_PAGE
-
-        await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
-
     @discord.ui.button(label="Play | Paus", row=0, style=discord.ButtonStyle.primary)
     async def resume_button_callback(self, interaction, button):
         gid, index = self.get_msg(interaction)
@@ -47,13 +37,27 @@ class QueueButton(discord.ui.View):
         queue_list = await load_queue(interaction)
         await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
 
+    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary)
+    async def prev_button_callback(self, interaction, button):
+        gid, index = self.get_msg(interaction)
+        queue_list = await load_queue(interaction)
+
+        if index - NEXT_PAGE < 0:   index = 0
+        else:   index -= NEXT_PAGE
+
+        QUEUE_INDEX[gid] = index
+
+        await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
+
     @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary)
     async def next_button_callback(self, interaction, button):
         gid, index = self.get_msg(interaction)
         queue_list = await load_queue(interaction)
 
-        if index + NEXT_PAGE > len(queue_list):   index = len(queue_list) - NEXT_PAGE
-        else:   index += NEXT_PAGE
+        if index + NEXT_PAGE >= len(queue_list):     index = len(queue_list) - NEXT_PAGE
+        else:                                       index += NEXT_PAGE
+
+        QUEUE_INDEX[gid] = index
 
         await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
 
@@ -176,7 +180,9 @@ async def convert_queue_to_embed(ctx, queue_list, start, end=NEXT_PAGE):
                 try:    embedVar.add_field(name=f'**[{start+i+1}] {queue[i].title}**', value=f'', inline=False)
                 except: embedVar.add_field(name=f'**[{start+i+1}] {queue[i]["title"]}**', value=f'', inline=False)
             except:
-                embedVar.add_field(name=f'**f[{start+i+1}]\t Error Title\n**', value=f'', inline=False)
+                embedVar.add_field(name=f'**f[{start+i+1}]\t Error Title | Will be deleted automatically\n**', value=f'', inline=False)
+                # delete song from queue
+                song_queue[ctx.guild.id].pop(i)
     return embedVar
 
 async def load_queue(msg):

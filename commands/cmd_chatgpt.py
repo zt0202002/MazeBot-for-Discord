@@ -10,6 +10,7 @@ from commands import cmd_play, cmd_queue, cmd_join, cmd_current, cmd_resume, cmd
 chatbot = {}
 CHAT_CHANNEL_ID = []
 CHAT_MUSIC_ID = []
+CHAT_THREAD_ID = {}
 CHAT_GID = []
 
 def split_string_into_chunks(string, chunk_size):
@@ -49,10 +50,11 @@ def tidy_response(i):# Optionally spoilerify or hide the most repetitive annoyin
 # @to_thread
 async def get_answer(chatbot,query,id):
     try:
-        response = await asyncio.wait_for(asyncio.to_thread(chatbot.ask,query,user=id), timeout=30)
+        response = await asyncio.wait_for(asyncio.to_thread(chatbot.ask,query,user=id), timeout=60)
     except asyncio.TimeoutError:
         return "Timeout!"
     return response
+    """
     prev_text = ""
     for data in chatbot.ask(query):
         print('str indicies: ', data)
@@ -60,19 +62,25 @@ async def get_answer(chatbot,query,id):
         print(message, end="", flush=True)
         prev_text = data["message"]
     return prev_text
+    """
+    
 
-async def load_channel_id():
-    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID
+async def load_channel_id(bot):
+    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID, CHAT_THREAD_ID
     chat_file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
     music_file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
     gid_file = f'./QueueLog/ChatGPTChannel/chatserver.json'
+    thread_file = f'./QueueLog/ChatGPTChannel/chatthread.json'
 
+    # load channel id
     if exists(chat_file):
-        try: 
+        try:    
             with open(chat_file, 'r') as f:  CHAT_CHANNEL_ID = json.load(f)
         except: CHAT_CHANNEL_ID = []
     else:
         with open(chat_file, 'w') as f:  json.dump([], f)
+
+    # load music channel id
     if exists(music_file):
         try: 
             with open(music_file, 'r') as f:  CHAT_MUSIC_ID = json.load(f)
@@ -81,6 +89,7 @@ async def load_channel_id():
     else:
         with open(music_file, 'w') as f:  json.dump([], f)
 
+    # load server id
     if exists(gid_file):
         try: 
             with open(gid_file, 'r') as f:  CHAT_GID = json.load(f)
@@ -89,14 +98,24 @@ async def load_channel_id():
     else:
         with open(gid_file, 'w') as f:  json.dump([], f)
 
-    # turn on chatgpt for specific server
-    # await turn_on_chatgpt(963220885706244106)
-    # await turn_on_chatgpt(784597124342874122)
-    # await turn_on_chatgpt(703476595821903953)
-    # await turn_on_chatgpt(1070832939329392713)
+    # load thread id
+    if exists(thread_file):
+        try:    
+            with open(thread_file, 'r') as f:  CHAT_THREAD_ID = json.load(f)
+            delete_list = []
+            for i in CHAT_THREAD_ID:    
+                if bot.get_channel(int(i)) is None:  
+                    print('Thread Deleted: ', i)
+                    delete_list.append(i)
+            for i in delete_list:   del CHAT_THREAD_ID[i]
+            with open(thread_file, 'w') as f:  json.dump(CHAT_THREAD_ID, f)
+        except:
+            CHAT_THREAD_ID = {}
+    else:
+        with open(thread_file, 'w') as f:  json.dump({}, f)
 
 async def set_channel(cid, type='chat'):
-    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID
+    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID, CHAT_THREAD_ID
     if type == 'chat':  file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
     elif type == 'music':  file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
     elif type == 'server':  file = f'./QueueLog/ChatGPTChannel/chatserver.json'
@@ -119,42 +138,60 @@ async def set_channel(cid, type='chat'):
             with open(file, 'w') as f: json.dump(CHAT_GID, f)
 
 async def remove_channel(cid, type='chat'):
-    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID
+    global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID, CHAT_THREAD_ID
     if type == 'chat':  file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
     elif type == 'music':  file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
     elif type == 'server':  file = f'./QueueLog/ChatGPTChannel/chatserver.json'
+    elif type == 'thread':  file = f'./QueueLog/ChatGPTChannel/chatthread.json'
     else:   return
     
     with open(file, 'r') as f: 
         CHAT_CHANNEL_ID = json.load(f)
         if cid in CHAT_CHANNEL_ID and type=='chat':
-            if len(CHAT_CHANNEL_ID) == 1: CHAT_CHANNEL_ID = []
-            else:   CHAT_CHANNEL_ID.remove(cid)
-            with open(file, 'w') as f: json.dump(CHAT_CHANNEL_ID, f)
+            if len(CHAT_CHANNEL_ID) == 1:   CHAT_CHANNEL_ID = []
+            else:                           CHAT_CHANNEL_ID.remove(cid)
+            with open(file, 'w') as f:      json.dump(CHAT_CHANNEL_ID, f)
         elif cid in CHAT_MUSIC_ID and type=='music':
-            if len(CHAT_MUSIC_ID) == 1: CHAT_MUSIC_ID = []
-            else:   CHAT_MUSIC_ID.remove(cid)
-            with open(file, 'w') as f: json.dump(CHAT_MUSIC_ID, f)
+            if len(CHAT_MUSIC_ID) == 1:     CHAT_MUSIC_ID = []
+            else:                           CHAT_MUSIC_ID.remove(cid)
+            with open(file, 'w') as f:      json.dump(CHAT_MUSIC_ID, f)
         elif cid in CHAT_GID and type=='server':
-            if len(CHAT_GID) == 1: CHAT_GID = []
-            else:   CHAT_GID.remove(cid)
-            with open(file, 'w') as f: json.dump(CHAT_GID, f)
+            if len(CHAT_GID) == 1:          CHAT_GID = []
+            else:                           CHAT_GID.remove(cid)
+            with open(file, 'w') as f:      json.dump(CHAT_GID, f)
+        elif type=='thread':
+            if str(cid.id) in CHAT_THREAD_ID:
+                if len(CHAT_THREAD_ID) == 1:    CHAT_THREAD_ID = dict()
+                else:                           del CHAT_THREAD_ID[str(cid.id)]
+                with open(file, 'w') as f:      json.dump(CHAT_THREAD_ID, f)
+                await cid.delete()
+            else:
+                await cid.delete()
 
-async def turn_on_chatgpt(gid, prompt=None):
+
+async def turn_on_chatgpt(gid, prompt=None, thread_prompt=None, thread_customized=None):
     load_dotenv()
     global chatbot
     key = os.getenv('CHATGPT_API_KEY')
     # print(f'{key}')
     if prompt is None:
-        with open('chatgpt_prompts/dcbot_prompt.prompt', 'r') as file:
-            prompt = file.read()
-    if prompt == 'music':
+        with open('chatgpt_prompts/dcbot_prompt.prompt', 'r') as file:  prompt = file.read()
+        chatbot[gid] = Chatbot(api_key=key, max_tokens=3096, system_prompt=prompt)
+        await set_channel(gid, 'server')
+    elif prompt == 'music':
         with open('chatgpt_prompts/dcbot_music.prompt', 'r') as file:
             prompt = file.read()
         chatbot[gid] = Chatbot(api_key=key, max_tokens=2048, system_prompt=prompt)
         return
-    chatbot[gid] = Chatbot(api_key=key, max_tokens=3096, system_prompt=prompt)
-    await set_channel(gid, 'server')
+    elif prompt == 'thread':
+        if thread_customized is None:
+            with open('chatgpt_prompts/dcbot_prompt.prompt', 'r') as file:  prompt = file.read()
+        elif thread_prompt is None:
+            prompt = thread_customized
+        else:
+            # TODO: add thread prompt
+            pass
+        chatbot[gid] = Chatbot(api_key=key, max_tokens=3096, system_prompt=prompt)
 
 async def turn_off_chatgpt(gid):
     global chatbot, CHAT_GID
@@ -208,4 +245,31 @@ async def is_music_commands(ctx, bot, msg, response):
     music_gpt.reset()
     return True
 
-# async def chatgpt(msg, str):
+async def set_thread(ctx, bot, name, prompt, type = 'public'):
+    global chatbot, CHAT_THREAD_ID
+    file = f'./QueueLog/ChatGPTChannel/chatthread.json'
+    # if channel is thread
+    if ctx.channel.type == discord.ChannelType.public_thread or ctx.channel.type == discord.ChannelType.private_thread:
+        # print(CHAT_THREAD_ID)
+        thread = ctx.channel
+        await ctx.reply('Change the name of the thread to start a new chat.')
+        await thread.edit(name=name)
+        if thread.id not in CHAT_THREAD_ID: 
+            CHAT_THREAD_ID[str(thread.id)] = prompt
+            await thread.edit(name=name)
+
+    elif type == 'public':  thread = await ctx.channel.create_thread(name=name, type=discord.ChannelType.public_thread)
+    elif type == 'private': thread = await ctx.channel.create_thread(name=name, type=discord.ChannelType.private_thread)
+    else:                   await ctx.reply('What the hell you got here?');   return
+
+    await thread.send(f'This is a thread with chatgpt. The prompt:\n ```\n{prompt}\n```')
+    if type == 'public':    await ctx.reply(f'Created a thread with chatgpt!\n{thread.mention}')
+    else:                   await ctx.reply(f'Created a private thread with chatgpt!\n{thread.mention}', ephemeral=True)
+
+    # add thread id to json
+    with open(file, 'r') as f:  CHAT_THREAD_ID = json.load(f)
+    CHAT_THREAD_ID[str(thread.id)] = prompt
+    with open(file, 'w') as f:  json.dump(CHAT_THREAD_ID, f)
+
+    # turn on chatgpt
+    await turn_on_chatgpt(str(thread.id), prompt="thread", thread_prompt=None, thread_customized=prompt)

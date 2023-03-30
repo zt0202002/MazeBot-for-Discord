@@ -43,9 +43,9 @@ class Bot(commands.Bot):
             # await self.tree.sync(guild = discord.Object(id=ids[0])) #guild specific: leave blank if global (global registration can take 1-24 hours)
             # await self.tree.sync(guild = discord.Object(id=ids[1])) #guild specific: leave blank if global (global registration can take 1-24 hours)
             await self.tree.sync()
+            await cmd_chatgpt.load_channel_id(self)
             self.synced = True
-            await cmd_chatgpt.load_channel_id()
-
+            
         print(f"We have logged in as {self.user}.")
 
     # async def on_command_error(self, ctx, error):
@@ -170,5 +170,23 @@ async def chatgpt_channel(ctx, channel: discord.TextChannel):
     await cmd_chatgpt.remove_channel(channel.id, 'music')
     await ctx.send(f"已关闭无指令点歌功能！")
 
+@bot.hybrid_command(with_app_command=True, name = 'chatgpt_public_thread', description=dp.chatgptPublicThread) #guild specific slash command
+async def chatgpt_public_thread(ctx, name: str, prompt: str):
+    await cmd_chatgpt.set_thread(ctx, bot, name, prompt, type='public')
 
-bot.run(os.getenv('TOKEN'))
+@bot.hybrid_command(with_app_command=True, name = 'chatgpt_private_thread', description=dp.chatgptPrivateThread) #guild specific slash command
+async def chatgpt_private_thread(ctx, name: str, prompt: str):
+    await cmd_chatgpt.set_thread(ctx, bot, name, prompt, type='private')
+
+@bot.hybrid_command(with_app_command=True, name = 'delete_current_thread', description=dp.chatgptDeleteThread) #guild specific slash command
+async def delete_current_thread(ctx):
+    if ctx.channel.type == discord.ChannelType.private_thread or ctx.channel.type == discord.ChannelType.public_thread:
+        thread = ctx.channel
+        await ctx.reply(f"deleting {thread.name}！")
+    else:
+        await ctx.reply("Current text channel is not a thread!")
+        return
+    # await thread.delete()
+    await cmd_chatgpt.remove_channel(thread, 'thread')
+
+bot.run(os.getenv('TOKEN2'))
