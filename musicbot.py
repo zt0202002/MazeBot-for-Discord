@@ -200,4 +200,13 @@ async def help(ctx):
         print(e)
         await ctx.reply("Help file not found!")
 
+@bot.hybrid_command(with_app_command=True, name = 'server_number', description="Test Commands: show the number of servers using this bot") #guild specific slash command
+async def server_number(ctx):
+    await ctx.reply(f"Currently, {len(bot.guilds)} servers are using this bot!")
+    names = '```\n'
+    for i in bot.guilds:
+        names += i.name + '\n'
+    names += '```'
+    await ctx.reply(names)
+
 bot.run(os.getenv('TOKEN2'))
