@@ -1,27 +1,36 @@
-# 马子的MazeBot for Discord
----
+# MazeBot for Discord
 
-> **这里是马子的音乐bot，后续内容更新中…**
-> 
-
-> **目前马子的音乐bot会随机回复一些话（功能无法关闭）**
-> 
+**添加bot：[MazeBot for Discord App](https://discord.com/oauth2/authorize?client_id=1051385856134488124&permissions=1643315723888&scope=applications.commands%20bot)**
 
 ---
+> **当前版本并不稳定，可能会出现各种问题，如果有问题请联系茶慕。**
+> QQ： 365968531
+> discord:  MazeCharmZzt#2964
+
+> **当前版本仅支持简单的Discord的音乐功能与聊天功能！**
+
+> 如果使用过程中遇到任何问题，请使用 `\report` 指令向茶慕反馈问题。
+
 ### Related Links:
 - **[MazeBot for Discord App](https://discord.com/api/oauth2/authorize?client_id=1051385856134488124&permissions=1643315723888&scope=applications.commands%20bot)**
 - **[马子茶慕的Notion](https://www.notion.so/Notion-14b0d5588f804acbb39ce58bc37e978e)** 
+---
 
 # Update Note
 
 ---
-
+### March 31, 2021
+- 增加了chatgpt功能！现在可以在频道里和bot聊天啦！
+- 在使用`\chatgpt_on`后，支持使用`!<TEXT>`或者`;<TEXT>`和bot在频道中聊天！
+- 在使用`\set_chat_channel <channel>`后，支持直接与bot在设定中的频道聊天！
+- 在使用`\set_music_channel <channel>`后，支持直接用口头化的指令在设定中的频道播放音乐！
+- 在使用`\chatgpt_public_thread <thread_name> <prompt>`后，支持在Thread中用自己给bot的设定进行聊天！
 
 ### December 16, 2022
 
 - 规划整理了下当前的代码文件，将各个function写入单独的python文件中。
 - 当bot所在频道没人的时候，bot会自动离开。
-- 当bot离开时，保存当前未完成播放的歌单，并下次回来后输入`/loading Server History` 即可播放之前未完成播放的歌单。
+- 当bot离开时，保存当前未完成播放的歌单，并下次回来后输入`/load History` 即可播放之前未完成播放的歌单。
 
 ### December 14, 2022
 
@@ -41,12 +50,12 @@
 
 ---
 
-# 当前功能
+# 当前音乐功能
 
 ---
 | Command   | Description  |  Command   | Description  |
 | -------   | -----------  | -------   | -----------  |
-| `play`    | 暂停歌曲      |  `load Server History` | 当bot离开时，保存当前未播放完成的歌单，并下次回来后输入`/load Server History` 即可播放之前未完成播放的歌单。 |
+| `play`    | 暂停歌曲      |  `load Server` | 当bot离开时，保存当前未播放完成的歌单，并下次回来后输入`/load Server History` 即可播放之前未完成播放的歌单。 |
 | `pause`   | 暂停歌曲      |   `load Mine` | 加载自己保存的歌单 |
 | `skip`    | 跳过当前歌曲  |   `save [url]` | 保存链接中的歌单 |
 | `skipto`  | 跳到指定歌曲  |   `report` | 报告错误给马子 |
@@ -55,20 +64,22 @@
 | `current` | 显示当前歌曲  |   `current` | 显示当前歌曲 |
 | `leave`   | 让bot离开频道 |   `search` | 搜索歌曲 |
 
+# 当前聊天功能
+
+---
+| Command   | Description  |  Command   | Description  |
+| -------   | -----------  | -------   | -----------  |
+| `chatgpt_on`    | 开启聊天功能      |  `chatgpt_off` | 关闭聊天功能 |
+| `set_chat_channel <channel>`   | 设置聊天频道      |   `set_music_channel <channel>` | 设置音乐频道 |
+| `chatgpt_public_thread <name> <prompt>`    | 在Public Thread中聊天  |   `chatgpt_private_thread <name> <prompt>` | 在PrivateThread中聊天 |
+| `delete_chat_channel <channel>`  | 删除该聊天频道的chatgpt功能  |   `delete_music_channel <channel>` | 删除该聊天频道的音乐口语指令功能 |
+| `delete_current_thread`  | 删除当前Thread  | 
 
 # 待改进的功能
 
 ---
 
-- [ ]  `Search`
-    - [x]  search 名字
-    - [ ]  显示可选列表
-    - [ ]  让client选择一首播放
-- [ ]  `Queue`
-    - [x]  显示当前歌曲列表
-    - [x]  美化列表
-    - [ ]  选择歌曲进行切歌
-    - [ ]  分页
+- 还没想好捏
 
 ---
 
@@ -83,7 +94,6 @@
 
 ---
 
-- [ ]  ChatGPT
 - [ ]  支持Spotify
 - [ ]  …
 
@@ -93,5 +103,4 @@
 
 ---
 
-- [ ]  `/pause` 时，无法读取当前列表中的歌，会显示当前🈚️歌曲播放。
-- [ ]  …
+- 无
