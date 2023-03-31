@@ -1,8 +1,8 @@
 # MazeBot for Discord
 
 **添加bot：[MazeBot for Discord App](https://discord.com/oauth2/authorize?client_id=1051385856134488124&permissions=1643315723888&scope=applications.commands%20bot)**
-
 ---
+
 > **当前版本并不稳定，可能会出现各种问题，如果有问题请联系茶慕。**
 
 > **当前版本仅支持简单的Discord的音乐功能与聊天功能！**
@@ -16,11 +16,9 @@
 ### 联系方式：
 - QQ： 365968531
 - discord:  MazeCharmZzt#2964
----
 
 # Update Note
 
----
 ### March 31, 2021
 - 增加了chatgpt功能！现在可以在频道里和bot聊天啦！
 - 在使用`\chatgpt_on`后，支持使用`!<TEXT>`或者`;<TEXT>`和bot在频道中聊天！
@@ -54,7 +52,6 @@
 
 # 当前音乐功能
 
----
 | Command   | Description  |  Command   | Description  |
 | -------   | -----------  | -------   | -----------  |
 | `play`    | 暂停歌曲      |  `load Server` | 当bot离开时，保存当前未播放完成的歌单，并下次回来后输入`/load Server History` 即可播放之前未完成播放的歌单。 |
@@ -68,7 +65,6 @@
 
 # 当前聊天功能
 
----
 | Command   | Description  |  Command   | Description  |
 | -------   | -----------  | -------   | -----------  |
 | `chatgpt_on`    | 开启聊天功能      |  `chatgpt_off` | 关闭聊天功能 |
@@ -79,30 +75,23 @@
 
 # 待改进的功能
 
----
 
 - 还没想好捏
 
----
 
 # 研发中
 
----
 
 - [ ]  `Repeat` 重复当前歌曲
 - [ ]  …
 
 # 后续功能
 
----
-
 - [ ]  支持Spotify
 - [ ]  …
 
----
 
 # 已知问题
 
----
 
 - 无
