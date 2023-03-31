@@ -4,8 +4,6 @@
 
 ---
 > **当前版本并不稳定，可能会出现各种问题，如果有问题请联系茶慕。**
-> QQ： 365968531
-> discord:  MazeCharmZzt#2964
 
 > **当前版本仅支持简单的Discord的音乐功能与聊天功能！**
 
@@ -14,6 +12,10 @@
 ### Related Links:
 - **[MazeBot for Discord App](https://discord.com/api/oauth2/authorize?client_id=1051385856134488124&permissions=1643315723888&scope=applications.commands%20bot)**
 - **[马子茶慕的Notion](https://www.notion.so/Notion-14b0d5588f804acbb39ce58bc37e978e)** 
+
+### 联系方式：
+- QQ： 365968531
+- discord:  MazeCharmZzt#2964
 ---
 
 # Update Note
