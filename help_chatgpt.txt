@@ -1,0 +1,22 @@
+**Chat Commands**
+```python
+# After turning on chatgpt, you can use '!' or ';' in front of messages to chat with the bot
+\chatgpt_on: turns on chatgpt on your server
+\chatgpt_off: turns off chatgpt on your server
+
+# After setting a channel, you can directly chat with the bot in that channel. And in music channel, you can use oral commands to control the bot playing music
+\set_chat_channel: sets the chat text channel for chatgpt
+\set_music_channel: sets the music channel for chatgpt
+
+\delete_chat_channel: remove the direct chat ability in that channel
+\delete_music_channel: remove the direct music control ability in that channel
+
+# After turning on chatgpt thread, you can directly chat with the bot in that channel.
+\chatgpt_public_thread <thread_name> <prompt>: 
+turns on public chatgpt thread on this server, you can set a thread name and a prompt for this chatgpd thread. 
+
+\chatgpt_private_thread <thread_name> <prompt>:
+turns on private chatgpt thread on this server, you can set a thread name and a prompt for this chatgpd thread.
+
+\delete_chatgpt_thread <thread_name>: deletes a chatgpt thread on this server
+```

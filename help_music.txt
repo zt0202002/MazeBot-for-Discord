@@ -1,0 +1,26 @@
+**MazeBot**
+
+> Hello! This is a discord music and chatgpt bot made by me, Maze. It is currently in development and is not yet ready for public use. If you would like to help me develop this bot, please contact me on discord at MazeCharmZzt#2964. Thank you!
+
+**Music Commands**
+```python
+---------Basic Commands---------
+\join: lets the bot join your voice channel
+\leave: makes the bot leave your voice channel
+
+\play: plays a song/playlist from youtube/bilibili
+\search: searches for a song on youtube
+
+\pause: pauses the current song
+\resume: resumes the current song
+\skip: skips the current song (You can use skipto/skipall)
+\delete <num>: deletes a song from the queue
+
+\queue: shows the current queue
+\current: shows the current song
+
+---------Advanced Commands---------
+\load History: loads previous unfinished songs of the server
+\load Mine: loads a playlist from youtube (You saved to this bot)
+\save <Playlist>: saves youtube playlist to this bot
+```

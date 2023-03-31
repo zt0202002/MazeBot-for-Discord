@@ -2,8 +2,6 @@
 *.json
 *.pyc
 __pycache__
-report.txt
-*.txt
 *.mp3
 *.wav
 test.py

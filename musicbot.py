@@ -189,4 +189,15 @@ async def delete_current_thread(ctx):
     # await thread.delete()
     await cmd_chatgpt.remove_channel(thread, 'thread')
 
+@bot.hybrid_command(with_app_command=True, name = 'help_commands', description=dp.help) #guild specific slash command
+async def help(ctx):
+    try:
+        with open('help_music.txt', 'r') as f:    help_music = f.read()
+        with open('help_chatgpt.txt', 'r') as f:    help_chatgpt = f.read()
+        await ctx.reply(help_music)
+        await ctx.reply(help_chatgpt)
+    except Exception as e:
+        print(e)
+        await ctx.reply("Help file not found!")
+
 bot.run(os.getenv('TOKEN2'))

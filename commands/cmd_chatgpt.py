@@ -146,7 +146,7 @@ async def remove_channel(cid, type='chat'):
     else:   return
     
     with open(file, 'r') as f: 
-        CHAT_CHANNEL_ID = json.load(f)
+        # CHAT_CHANNEL_ID = json.load(f)
         if cid in CHAT_CHANNEL_ID and type=='chat':
             if len(CHAT_CHANNEL_ID) == 1:   CHAT_CHANNEL_ID = []
             else:                           CHAT_CHANNEL_ID.remove(cid)
