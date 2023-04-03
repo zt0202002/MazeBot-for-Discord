@@ -205,9 +205,12 @@ def clear_previous_chat_history(chatbot):
     if chatbot.get_max_tokens('default') > 1536: return
     chat_len = len(chatbot.conversation['default'])
     if chat_len <= 1:   return
-    for i in range(chat_len):
-        if chatbot.get_max_tokens('default') <= 1536:
-            chatbot.conversation['default'].pop(1)
+    try:
+        for i in range(chat_len):
+            if chatbot.get_max_tokens('default') <= 1536:
+                chatbot.conversation['default'].pop(1)
+    except:
+        return
 
 async def is_music_commands(ctx, bot, msg, response):
     global chatbot
