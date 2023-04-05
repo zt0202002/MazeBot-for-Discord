@@ -209,4 +209,4 @@ async def server_number(ctx):
     names += '```'
     await ctx.reply(names)
 
-bot.run(os.getenv('TOKEN2'))
+bot.run(os.getenv('TOKEN'))
