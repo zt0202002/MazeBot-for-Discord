@@ -60,17 +60,21 @@ async def news(ctx):
         
         embedVar = discord.Embed(title=f'今日要闻', description='', color=0x8B4C39)
 
+        i = 0
+
         for new in news[2:]:
             title = new.find_all('textarea')[2]
             link = 'https://world.huanqiu.com/article/' + new.find_all('textarea')[0].get_text()
-            embedVar.add_field(name=f"**{title.get_text()}**", value=f"{link}", inline=False)
+            embedVar.add_field(name=f"**{i+1}. {title.get_text()}**", value=f"{link}", inline=False)
+            i += 1
 
         today_recommand_news = soup.find_all(class_='csr_image_img_6_subtitle')
         news = today_recommand_news[0].find_all('div')
         for new in news[2:]:
             title = new.find_all('textarea')[3]
             link = 'https://world.huanqiu.com/article/' + new.find_all('textarea')[0].get_text()
-            embedVar.add_field(name=f"**{title.get_text()}**", value=f"{link}", inline=False)
+            embedVar.add_field(name=f"**{i+1}. {title.get_text()}**", value=f"{link}", inline=False)
+            i += 1
         
         await ctx.reply(embed=embedVar)
     except Exception:
@@ -86,16 +90,14 @@ async def game_news(ctx):
 
         embedVar = discord.Embed(title=f'游戏新闻', description='', color=0x8B4C39)
 
-        length = 0
-
+        i = 0
         for new in news:
             title = new.find('a').find('div').get('title')
             link = 'https://www.yystv.cn' + new.find('a').get('href')
 
-            embedVar.add_field(name=f"**{title}**", value=f"{link}", inline=False)
+            embedVar.add_field(name=f"**{i+1}. {title}**", value=f"{link}", inline=False)
 
-            # if length == 5: break
-            length += 1
+            i+=1
         
         await ctx.reply(embed=embedVar)
 

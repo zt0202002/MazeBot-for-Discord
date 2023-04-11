@@ -26,7 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from commands import messages, test_slash, cmd_join, cmd_play, cmd_search, cmd_queue, cmd_current, cmd_delete
 from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random, cmd_minecraft, cmd_chatgpt
-from commands import cmd_reaction, cmd_googlesearch
+from commands import cmd_reaction, cmd_googlesearch, cmd_splatoon
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -68,8 +68,8 @@ async def on_voice_state_update(member, before, after): await cmd_join.on_voice_
 async def on_reaction_add(reaction, user):  await cmd_reaction.reply_reaction(reaction, user, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'test', description='testing') #guild specific slash command
-@commands.has_permissions(administrator=True)
-async def test(ctx: commands.Context): await test_slash.test(ctx)
+# @commands.has_permissions(administrator=True)
+async def test(ctx: commands.Context): await test_slash.slash2(ctx)
 
 @bot.hybrid_command(with_app_command=True, name = 'join', description=dp.join) #guild specific slash command
 async def join(ctx: commands.Context):  await cmd_join.join(ctx, bot)
@@ -252,4 +252,10 @@ async def news(ctx, type: Literal['World', 'Video Game']):
         await cmd_googlesearch.game_news(ctx)
     else:
         await ctx.reply("Invalid type!")
+
+@bot.hybrid_command(with_app_command=True, name = 'splatoon', description='Splatoon 3 Schedule')
+async def splatoon(ctx, mode: Literal['regular', 'rank', 'open_rank', 'x_rank', 'pve', 'big run', 'pve team']):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_splatoon.splatoon(ctx, mode)
+
 bot.run(os.getenv('TOKEN2'))
