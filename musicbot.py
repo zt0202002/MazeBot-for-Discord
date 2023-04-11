@@ -26,7 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from commands import messages, test_slash, cmd_join, cmd_play, cmd_search, cmd_queue, cmd_current, cmd_delete
 from commands import cmd_skip, cmd_resume, cmd_clear, cmd_report, cmd_loading, cmd_random, cmd_minecraft, cmd_chatgpt
-from commands import cmd_reaction
+from commands import cmd_reaction, cmd_googlesearch
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -152,14 +152,19 @@ async def chatgpt_off(ctx):
 
 @bot.hybrid_command(with_app_command=True, name = 'set_chat_channel', description=dp.chatgptChatChannel) #guild specific slash command
 async def chatgpt_channel(ctx, channel: discord.TextChannel):
-    await cmd_chatgpt.set_channel(channel.id, 'chat')
-    await ctx.send(f"将{channel.name}设置为聊天频道，可以和我愉快聊天啦！")
+    result = await cmd_chatgpt.set_channel(channel.id, 'chat')
+    if result != '设置成功':    
+        await ctx.send(f"该频道已经被设为{result}了！")
+    else:                    
+        await ctx.send(f"将{channel.name}设置为聊天频道，可以和我愉快聊天啦！")
 
 @bot.hybrid_command(with_app_command=True, name = 'set_music_channel', description=dp.chatgptMusicChannel) #guild specific slash command
 async def chatgpt_channel(ctx, channel: discord.TextChannel):
-    await cmd_chatgpt.set_channel(channel.id, 'music')
-    await ctx.send(f"将{channel.name}设置为音乐频道，可以无需指令放歌啦！")
-
+    result = await cmd_chatgpt.set_channel(channel.id, 'music')
+    if result != '设置成功':    
+        await ctx.send(f"该频道已经被设为{result}了！")
+    else:                    
+        await ctx.send(f"将{channel.name}设置为音乐频道，可以和我愉快聊天啦！")
 @bot.hybrid_command(with_app_command=True, name = 'delete_chat_channel', description=dp.chatgptChatChannelDelete) #guild specific slash command
 async def chatgpt_channel(ctx, channel: discord.TextChannel):
     await cmd_chatgpt.remove_channel(channel.id, 'chat')
@@ -207,6 +212,48 @@ async def server_number(ctx):
     for i in bot.guilds:
         names += i.name + '\n'
     names += '```'
-    await ctx.reply(names)
+    await ctx.send(names)
 
+<<<<<<< Updated upstream
 bot.run(os.getenv('TOKEN'))
+=======
+@bot.hybrid_command(with_app_command=True, name = 'google', description='Google Search')
+async def google(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.google(ctx, query)
+
+@bot.hybrid_command(with_app_command=True, name = 'reddit', description='Reddit Search')
+async def google_image(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.reddit(ctx, query)
+
+@bot.hybrid_command(with_app_command=True, name = 'stackoverflow', description='Stackoverflow Search')
+async def stackoverflow(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.stackoverflow(ctx, query)
+
+@bot.hybrid_command(with_app_command=True, name = 'bilibili', description='Bilibili Search')
+async def bilibili(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.bilibili(ctx, query)
+
+@bot.hybrid_command(with_app_command=True, name = 'moe', description='Moe Wiki Search')
+async def moe(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.moe(ctx, query)
+
+@bot.hybrid_command(with_app_command=True, name = 'ff14', description='FF14 Huiji Wiki Search')
+async def ffxiv(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.ffxiv(ctx, query)
+
+@bot.hybrid_command(with_app_command=True, name = 'news', description='今日要闻')
+async def news(ctx, type: Literal['World', 'Video Game']):    
+    if type == 'World':
+        await cmd_googlesearch.news(ctx)
+    elif type == 'Video Game':
+        await cmd_googlesearch.game_news(ctx)
+    else:
+        await ctx.reply("Invalid type!")
+bot.run(os.getenv('TOKEN2'))
+>>>>>>> Stashed changes

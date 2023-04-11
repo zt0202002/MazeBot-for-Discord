@@ -28,6 +28,7 @@ async def resume(ctx, bot, msg=None):
     else:
         embedVar = discord.Embed(title=f'歌曲已经在播放啦！', description=f'', color=0x487B60)
         if msg is None: await ctx.send(embed=embedVar)
+        else: await msg.edit(content='', embed=embedVar)
         return False
 
 async def pause(ctx, bot, msg=None, button=False):
@@ -52,4 +53,5 @@ async def pause(ctx, bot, msg=None, button=False):
     else:
         embedVar = discord.Embed(title=f'歌曲已经被暂停啦！', description=f'', color=0x487B60)
         if msg is None: await ctx.send(embed=embedVar)
+        else: await msg.edit(content='', embed=embedVar)
         return False

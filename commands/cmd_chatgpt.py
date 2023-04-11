@@ -116,6 +116,11 @@ async def load_channel_id(bot):
 
 async def set_channel(cid, type='chat'):
     global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID, CHAT_THREAD_ID
+
+    if type == 'chat':
+        if cid in CHAT_CHANNEL_ID:  return '聊天频道'
+        elif cid in CHAT_MUSIC_ID:  return '音乐频道'
+
     if type == 'chat':  file = f'./QueueLog/ChatGPTChannel/chatchannel.json'
     elif type == 'music':  file = f'./QueueLog/ChatGPTChannel/chatmusic.json'
     elif type == 'server':  file = f'./QueueLog/ChatGPTChannel/chatserver.json'
@@ -136,6 +141,8 @@ async def set_channel(cid, type='chat'):
         elif type=='server':
             CHAT_GID = CHAT_ID
             with open(file, 'w') as f: json.dump(CHAT_GID, f)
+
+    return '设置成功'
 
 async def remove_channel(cid, type='chat'):
     global CHAT_CHANNEL_ID, CHAT_MUSIC_ID, CHAT_GID, CHAT_THREAD_ID

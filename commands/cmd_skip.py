@@ -57,4 +57,5 @@ async def skip(ctx, bot, msg=None):
         embedVar = str_not_song_playing
     
     if msg is None: await ctx.send(embed=embedVar)
+    else: await msg.edit(content='', embed=embedVar)
     return

@@ -1,3 +1,7 @@
+<<<<<<< Updated upstream
 [2023-03-31 23:24:39.428278] MazeCharmZzt#2964 reported: 歌曲，歌曲列表 ，⚠️ pop index out of range
 [2023-04-03 21:46:40.813751] MazeCharmZzt#2964 reported: 自然语言点歌得加一下不在频道的提醒
 [2023-04-04 07:01:15.979813] MazeCharmZzt#2964 reported: 用搜索功能的时候，超过五首歌会出现errror title的情况
+=======
+[2023-04-05 03:37:30.310314] MazeCharmZzt#2964 reported: 离开频道后，queue还有东西显示的bug
+>>>>>>> Stashed changes
