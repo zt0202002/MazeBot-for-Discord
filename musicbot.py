@@ -214,9 +214,6 @@ async def server_number(ctx):
     names += '```'
     await ctx.send(names)
 
-<<<<<<< Updated upstream
-bot.run(os.getenv('TOKEN'))
-=======
 @bot.hybrid_command(with_app_command=True, name = 'google', description='Google Search')
 async def google(ctx, *, query: str):
     await ctx.interaction.response.defer(thinking=True)
@@ -256,4 +253,3 @@ async def news(ctx, type: Literal['World', 'Video Game']):
     else:
         await ctx.reply("Invalid type!")
 bot.run(os.getenv('TOKEN2'))
->>>>>>> Stashed changes
