@@ -6,5 +6,6 @@ __pycache__
 *.wav
 test.py
 .empty
-/QueueLog/**/*.json
+/QueueLog/*/*.json
+QueueLog/ServerHistory/963220885706244106.json
 *.json

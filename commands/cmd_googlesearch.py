@@ -10,6 +10,7 @@ class GoogleSearchButton(discord.ui.View):
     global GOOGLE_SEARCH_INDEX
 
     def get_msg(self, interaction):
+        self.timeout = None
         gid = interaction.message.id
         index, queue = GOOGLE_SEARCH_INDEX[gid]['index'], GOOGLE_SEARCH_INDEX[gid]['queue']
         type, query = GOOGLE_SEARCH_INDEX[gid]['type'], GOOGLE_SEARCH_INDEX[gid]['query']
