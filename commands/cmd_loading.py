@@ -6,7 +6,7 @@ from yt_dlp import YoutubeDL
 from help_functions.help_queue import *
 from os.path import exists
 
-from commands import cmd_play
+from commands import cmd_play, cmd_play_music
 
 async def loading_queue(ctx, type, bot):
     voice = get(bot.voice_clients, guild=ctx.guild)
@@ -25,7 +25,7 @@ async def loading_queue(ctx, type, bot):
             await msg.edit(content = '', embed=embedVar)
             return
 
-        await cmd_play.play_music(ctx, bot, msg, song_len)
+        await cmd_play_music.play_music(ctx, bot, msg, song_len)
         
         # embedVar = discord.Embed(title=f'已经将{song_len}首歌加入到播放列表了捏！', description="", color=0x8B4C39)
         # if not voice.is_playing():

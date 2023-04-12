@@ -12,6 +12,7 @@ class CurrentButton(discord.ui.View):
 
     @discord.ui.button(label="Play | Paus", row=0, style=discord.ButtonStyle.primary)
     async def resume_button_callback(self, interaction, button):
+        self.timeout = None
         button = await resume(interaction, interaction.client, interaction.message)
         if button is False: await pause(interaction, interaction.client, interaction.message)
         # await asyncio.sleep(0.5)
@@ -20,6 +21,7 @@ class CurrentButton(discord.ui.View):
 
     @discord.ui.button(label="Skip", row=0, style=discord.ButtonStyle.primary)
     async def skip_button_callback(self, interaction, button):
+        self.timeout = None
         await skip(interaction, interaction.client, interaction.message)
         # await asyncio.sleep(0.5)
         embedvar = await current(interaction, interaction.client, interaction.message)
@@ -27,6 +29,7 @@ class CurrentButton(discord.ui.View):
 
     @discord.ui.button(label="Load", row=0, style=discord.ButtonStyle.success)
     async def refresh_button_callback(self, interaction, button):
+        self.timeout = None
         embedvar = await current(interaction, interaction.client, interaction.message)
         await interaction.response.edit_message(content = '', embed=embedvar, view=self)
 

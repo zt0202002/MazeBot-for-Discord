@@ -14,6 +14,7 @@ class QueueButton(discord.ui.View):
     global QUEUE_INDEX, QUEUE_ID, NEXT_PAGE
 
     def get_msg(self, interaction):
+        self.timeout = None
         gid = interaction.guild.id
         index = QUEUE_INDEX[gid]
         return gid, index

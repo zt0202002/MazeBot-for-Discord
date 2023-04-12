@@ -5,7 +5,7 @@ from discord import FFmpegPCMAudio
 from yt_dlp import YoutubeDL
 from pytube import Search
 from help_functions.help_queue import *
-from commands.cmd_play import play_music
+from commands.cmd_play_music import play_music
 from commands.cmd_queue import NEXT_PAGE
 from commands.cmd_join import join
 
@@ -19,7 +19,8 @@ SEARCH_ID = []
 class SeachButton(discord.ui.View):
     global SEARCH_INDEX, SEARCH_QUEUE
     
-    def get_msg(self, interaction):  
+    def get_msg(self, interaction):
+        self.timeout = None
         msg_id = interaction.message.id
         infos = SEARCH_QUEUE[msg_id]
         index = SEARCH_INDEX[msg_id]

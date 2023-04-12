@@ -9,6 +9,7 @@ class SplatoonButton(discord.ui.View):
     global SPLATOON_INDEX
 
     def get_msg(self, interaction):
+        self.timeout = None
         mid = interaction.message.id
         index = SPLATOON_INDEX[mid]['index']
         mode = SPLATOON_INDEX[mid]['mode']

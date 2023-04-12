@@ -4,48 +4,107 @@ import discord
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
-async def google_search_func(query, cx, type, num_results=3):
+GOOGLE_SEARCH_INDEX = {}
+
+class GoogleSearchButton(discord.ui.View):
+    global GOOGLE_SEARCH_INDEX
+
+    def get_msg(self, interaction):
+        gid = interaction.message.id
+        index, queue = GOOGLE_SEARCH_INDEX[gid]['index'], GOOGLE_SEARCH_INDEX[gid]['queue']
+        type, query = GOOGLE_SEARCH_INDEX[gid]['type'], GOOGLE_SEARCH_INDEX[gid]['query']
+        return gid, index, queue, type, query
+    
+    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary)
+    async def prev_button_callback(self, interaction, button):
+        gid, index, queue, type, query = self.get_msg(interaction)
+        if index - 3 < 0:   index = 0
+        else:   index -= 3
+
+        GOOGLE_SEARCH_INDEX[gid]['index'] = index
+
+        embedVar, a, b = await search_result_embed(query, queue, type, index)
+        await interaction.response.edit_message(content = '', embed=embedVar, view=self)
+    
+    @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary)
+    async def next_button_callback(self, interaction, button):
+        gid, index, queue, type, query = self.get_msg(interaction)
+        if index + 3 >= len(queue):     index = len(queue) - 3
+        else:                           index += 3
+
+        if index < 0:   index = 0
+
+        GOOGLE_SEARCH_INDEX[gid]['index'] = index
+
+        embedVar, a, b = await search_result_embed(query, queue, type, index)
+        await interaction.response.edit_message(content = '', embed=embedVar, view=self)
+
+
+async def search_result_embed(query, results, type, index):
+    embedVar = discord.Embed(title=f'{type} Search Results for {query}', description='', color=0x8B4C39)
+
+    for i, item in enumerate(results):
+        if i < index:   continue
+        if i >= index + 3:  break
+        embedVar.add_field(name=f"**{i+1}. {item['title']}**", value=f"{item['snippet']}\n{item['link']}", inline=False)
+
+    return embedVar, index, results
+
+async def google_search_func(query, cx, type, num_results=9, index=0):
     api_key = os.getenv('GOOGLE_SEARCH_API')
 
     service = build("customsearch", "v1", developerKey=api_key)
     response = service.cse().list(q=query, cx=cx, num=num_results).execute()
 
-    embedVar = discord.Embed(title=f'{type} Search Results for {query}', description='', color=0x8B4C39)
+    results = response['items']
 
-    for i, item in enumerate(response['items']):
-        embedVar.add_field(name=f"**{i+1}. {item['title']}**", value=f"{item['snippet']}\n{item['link']}", inline=False)
+    return await search_result_embed(query, results, type, index)
 
-    return embedVar
+async def reply_google_search(ctx, query, type, embedVar, index, results):
+    global GOOGLE_SEARCH_INDEX
+
+    msg = await ctx.reply(embed=embedVar, view=GoogleSearchButton())
+    GOOGLE_SEARCH_INDEX[msg.id] = {'index': index, 'queue': results, 'type': type, 'query': query}
 
 async def google(ctx, query):
     cx = os.getenv('CX_GOOGLE')
-    embedVar = await google_search_func(query, cx, 'Google')
-    await ctx.reply(embed=embedVar)
-
+    embedVar, index, results = await google_search_func(query, cx, 'Google')
+    await reply_google_search(ctx, query, 'Google', embedVar, index, results)
+    
 async def reddit(ctx, query):
     cx = os.getenv('CX_REDDIT')
-    embedVar = await google_search_func(query, cx, 'Reddit')
-    await ctx.reply(embed=embedVar)
+    embedVar, index, results = await google_search_func(query, cx, 'Reddit')
+    await reply_google_search(ctx, query, 'Reddit', embedVar, index, results)
 
 async def stackoverflow(ctx, query):
     cx = os.getenv('CX_STACKOVERFLOW')
-    embedVar = await google_search_func(query, cx, 'Stackoverflow')
-    await ctx.reply(embed=embedVar)
+    embedVar, index, results = await google_search_func(query, cx, 'StackOverflow')
+    await reply_google_search(ctx, query, 'StackOverflow', embedVar, index, results)
 
 async def bilibili(ctx, query):
     cx = os.getenv('CX_BILIBILI')
-    embedVar = await google_search_func(query, cx, 'Bilibili')
-    await ctx.reply(embed=embedVar)
+    embedVar, index, results = await google_search_func(query, cx, 'Bilibili')
+    await reply_google_search(ctx, query, 'Bilibili', embedVar, index, results)
 
 async def moe(ctx, query):
     cx = os.getenv('CX_MOE')
-    embedVar = await google_search_func(query, cx, '萌娘百科')
-    await ctx.reply(embed=embedVar)
-
+    embedVar, index, results = await google_search_func(query, cx, '萌娘百科')
+    await reply_google_search(ctx, query, '萌娘百科', embedVar, index, results)
+    
 async def ffxiv(ctx, query):
     cx = os.getenv('CX_FFXIV')
-    embedVar = await google_search_func(query, cx, 'Huiji FF14 Wiki')
-    await ctx.reply(embed=embedVar)
+    embedVar, index, results = await google_search_func(query, cx, 'FFXIV')
+    await reply_google_search(ctx, query, 'FFXIV', embedVar, index, results)
+
+async def zhihu(ctx, query):
+    cx = os.getenv('CX_ZHIHU')
+    embedVar, index, results = await google_search_func(query, cx, '知乎')
+    await reply_google_search(ctx, query, '知乎', embedVar, index, results)
+
+async def bangumi(ctx, query):
+    cx = os.getenv('CX_BANGUMI')
+    embedVar, index, results = await google_search_func(query, cx, 'Bangumi')
+    await reply_google_search(ctx, query, 'Bangumi', embedVar, index, results)
 
 async def news(ctx):
     try:

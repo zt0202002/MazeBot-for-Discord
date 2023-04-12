@@ -244,6 +244,16 @@ async def ffxiv(ctx, *, query: str):
     await ctx.interaction.response.defer(thinking=True)
     await cmd_googlesearch.ffxiv(ctx, query)
 
+@bot.hybrid_command(with_app_command=True, name = 'zhihu', description='Zhihu Search')
+async def zhihu(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.zhihu(ctx, query)
+
+@bot.hybrid_command(with_app_command=True, name = 'bangumi', description='Bangumi Search')
+async def bangumi(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.bangumi(ctx, query)
+
 @bot.hybrid_command(with_app_command=True, name = 'news', description='今日要闻')
 async def news(ctx, type: Literal['World', 'Video Game']):    
     if type == 'World':

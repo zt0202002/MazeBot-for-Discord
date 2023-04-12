@@ -4,6 +4,7 @@ from discord import FFmpegPCMAudio
 from os.path import exists
 from yt_dlp import YoutubeDL
 from pytube import Playlist, YouTube as yt
+from bilibili_api import video as bilibili_video
 
 import json 
 
@@ -17,7 +18,7 @@ async def addToQueue(guild, ctx=None, url = None):
     if guild.id not in song_queue:
         song_queue[guild.id] = []
 
-    if 'youtube' not in url:
+    if 'youtube' not in url and 'bilibili' not in url:
         try:
             with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
             count = 0
@@ -30,6 +31,44 @@ async def addToQueue(guild, ctx=None, url = None):
                 song_queue[guild.id].append(info)
                 return 1
         except:
+            return False
+    elif 'bilibili' in url:
+        try:
+            # Get the video id
+            bv = None
+            p = None
+            for i in url.split('&')[0].split('/'):
+                if 'BV' in i:   
+                    if '?p=' in i:
+                        bv = i.split('?p=')[0]
+                        p = i.split('?p=')[1]
+                    else:
+                        bv = i
+                    break
+            if bv == None:  return False
+
+            # Get the video url
+            link = 'https://www.bilibili.com/video/' + bv
+
+            # Get the video info
+            v = bilibili_video.Video(bvid=bv)
+            info = await v.get_info()
+            video_num = info['videos']
+            videos = info['pages']
+
+            # Add the video to the queue
+            if p is not None:
+                temp_info = {'title': videos[int(p)-1]['part'], 'url': link + '?p=' + p}
+                song_queue[guild.id].append(temp_info)
+                return 1
+            
+            for i in range(video_num):
+                temp_info = {'title': videos[i]['part'], 'url': link + '?p=' + str(i+1)}
+                song_queue[guild.id].append(temp_info)
+                print(temp_info)
+            return video_num
+        except Exception:
+            print(Exception)
             return False
     else:
         try:
@@ -65,11 +104,9 @@ def check_queue(ctx, id):
             while True:
                 try:
                     cur_info = song_queue[id].pop(0)
-                    try:    
-                        url = cur_info.watch_url
-                        with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
-                    except: 
-                        info = cur_info['url']
+                    try:    url = cur_info.watch_url
+                    except: url = cur_info['url']
+                    with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
                     break
                 except:
                     continue
@@ -89,15 +126,24 @@ async def save_queue_into_file(voice, id, path='ServerHistory'):
     
     if id not in song_queue:
         song_queue[id] = []
+        current_song[id] = {}
+        
     elif len(song_queue[id]) > 0 or current_song[id] != {}:
         temp_urls = []
         temp_urls.append(current_song[id]['info']['webpage_url'])
-        for i in song_queue[id]:    temp_urls.append(i.watch_url)
+        for i in song_queue[id]:    
+            try:    temp_urls.append(i.watch_url)
+            except: temp_urls.append(i['url'])
         
         with open(file, 'w') as f:  json.dump(temp_urls, f)
-
+        song_queue[id] = []
+        current_song[id] = {}
+        
         return True
     else:
+        song_queue[id] = []
+        current_song[id] = {}
+
         with open(file, 'w') as f:  json.dump([], f)
         return True
 
