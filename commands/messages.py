@@ -24,7 +24,7 @@ async def on_message(message, bot, interaction=None):
     if message.guild is None:
         await bot.process_commands(message)
         return
-    if message.content.startswith('\\'):
+    if message.content.startswith('\\') or message.content.startswith('、'):
         await bot.process_commands(message)
         return
     
@@ -109,7 +109,7 @@ async def on_message(message, bot, interaction=None):
     # if message.content == '!refresh': chatbot.refresh_session(); await message.add_reaction("🔄"); print("refresh session"); return
     # if message.content == '!restart' and message.author.id == config['discord_admin_id']: os.execl(__file__, *sys.argv);return
     if message.content == '!reset': chatbot.reset();await message.add_reaction("💪"); print("reset chat"); return
-    if message.content.startswith('\\'):
+    if message.content.startswith('\\') or message.content.startswith('、'):
         await bot.process_commands(message)
         return
     
