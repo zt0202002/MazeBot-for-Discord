@@ -10,13 +10,12 @@ class GoogleSearchButton(discord.ui.View):
     global GOOGLE_SEARCH_INDEX
 
     def get_msg(self, interaction):
-        self.timeout = None
         gid = interaction.message.id
         index, queue = GOOGLE_SEARCH_INDEX[gid]['index'], GOOGLE_SEARCH_INDEX[gid]['queue']
         type, query = GOOGLE_SEARCH_INDEX[gid]['type'], GOOGLE_SEARCH_INDEX[gid]['query']
         return gid, index, queue, type, query
     
-    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def prev_button_callback(self, interaction, button):
         gid, index, queue, type, query = self.get_msg(interaction)
         if index - 3 < 0:   index = 0
@@ -27,7 +26,7 @@ class GoogleSearchButton(discord.ui.View):
         embedVar, a, b = await search_result_embed(query, queue, type, index)
         await interaction.response.edit_message(content = '', embed=embedVar, view=self)
     
-    @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def next_button_callback(self, interaction, button):
         gid, index, queue, type, query = self.get_msg(interaction)
         if index + 3 >= len(queue):     index = len(queue) - 3

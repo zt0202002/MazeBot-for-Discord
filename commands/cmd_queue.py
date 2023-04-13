@@ -14,12 +14,11 @@ class QueueButton(discord.ui.View):
     global QUEUE_INDEX, QUEUE_ID, NEXT_PAGE
 
     def get_msg(self, interaction):
-        self.timeout = None
         gid = interaction.guild.id
         index = QUEUE_INDEX[gid]
         return gid, index
 
-    @discord.ui.button(label="Play | Paus", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Play | Paus", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def resume_button_callback(self, interaction, button):
         gid, index = self.get_msg(interaction)
         button = await resume(interaction, interaction.client, interaction.message)
@@ -29,7 +28,7 @@ class QueueButton(discord.ui.View):
         queue_list = await load_queue(interaction)
         await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
 
-    @discord.ui.button(label="Skip", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Skip", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def skip_button_callback(self, interaction, button):
         gid, index = self.get_msg(interaction)
         await skip(interaction, interaction.client, interaction.message)
@@ -38,7 +37,7 @@ class QueueButton(discord.ui.View):
         queue_list = await load_queue(interaction)
         await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
 
-    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def prev_button_callback(self, interaction, button):
         gid, index = self.get_msg(interaction)
         queue_list = await load_queue(interaction)
@@ -50,7 +49,7 @@ class QueueButton(discord.ui.View):
 
         await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
 
-    @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def next_button_callback(self, interaction, button):
         gid, index = self.get_msg(interaction)
         queue_list = await load_queue(interaction)
@@ -62,7 +61,7 @@ class QueueButton(discord.ui.View):
 
         await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
 
-    @discord.ui.button(label="Load", row=0, style=discord.ButtonStyle.success)
+    @discord.ui.button(label="Load", row=0, style=discord.ButtonStyle.success, timeout=None)
     async def refresh_button_callback(self, interaction, button):
         gid, index = self.get_msg(interaction)
         queue_list = await load_queue(interaction)

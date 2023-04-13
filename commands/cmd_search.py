@@ -20,13 +20,12 @@ class SeachButton(discord.ui.View):
     global SEARCH_INDEX, SEARCH_QUEUE
     
     def get_msg(self, interaction):
-        self.timeout = None
         msg_id = interaction.message.id
         infos = SEARCH_QUEUE[msg_id]
         index = SEARCH_INDEX[msg_id]
         return  msg_id, infos, index
     
-    @discord.ui.button(label="1", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="1", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def first_button_callback(self, interaction, button):
         msg_id, infos, index = self.get_msg(interaction)
         
@@ -37,7 +36,7 @@ class SeachButton(discord.ui.View):
         queue_list_embed = await conver_search_queue_to_embed(infos, index)
         await interaction.response.edit_message(content = '', embed=queue_list_embed, view=self)
     
-    @discord.ui.button(label="2", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="2", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def second_button_callback(self, interaction, button):
         msg_id, infos, index = self.get_msg(interaction)
         
@@ -48,7 +47,7 @@ class SeachButton(discord.ui.View):
         queue_list_embed = await conver_search_queue_to_embed(infos, index)
         await interaction.response.edit_message(content = '', embed=queue_list_embed, view=self)
 
-    @discord.ui.button(label="3", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="3", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def third_button_callback(self, interaction, button):
         msg_id, infos, index = self.get_msg(interaction)
         
@@ -59,7 +58,7 @@ class SeachButton(discord.ui.View):
         queue_list_embed = await conver_search_queue_to_embed(infos, index)
         await interaction.response.edit_message(content = '', embed=queue_list_embed, view=self)
 
-    @discord.ui.button(label="4", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="4", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def forth_button_callback(self, interaction, button):
         msg_id, infos, index = self.get_msg(interaction)
         
@@ -70,7 +69,7 @@ class SeachButton(discord.ui.View):
         queue_list_embed = await conver_search_queue_to_embed(infos, index)
         await interaction.response.edit_message(content = '', embed=queue_list_embed, view=self)
 
-    @discord.ui.button(label="5", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="5", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def fifth_button_callback(self, interaction, button):
         msg_id, infos, index = self.get_msg(interaction)
         
@@ -88,7 +87,7 @@ class SeachButton(discord.ui.View):
         await interaction.response.edit_message(content = '', embed=queue_list_embed, view=self)
 
 
-    @discord.ui.button(label="Prev", row=1, style=discord.ButtonStyle.success)
+    @discord.ui.button(label="Prev", row=1, style=discord.ButtonStyle.success, timeout=None)
     async def next_button_callback(self, interaction, button):
         msg_id, infos, index = self.get_msg(interaction)
 
@@ -104,7 +103,7 @@ class SeachButton(discord.ui.View):
 
         # await interaction.message.edit(content="You pressed me!") 
 
-    @discord.ui.button(label="Next", row=1, style=discord.ButtonStyle.success)
+    @discord.ui.button(label="Next", row=1, style=discord.ButtonStyle.success, timeout=None)
     async def prev_button_callback(self, interaction, button):
         msg_id, infos, index = self.get_msg(interaction)
 

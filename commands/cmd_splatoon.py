@@ -9,13 +9,12 @@ class SplatoonButton(discord.ui.View):
     global SPLATOON_INDEX
 
     def get_msg(self, interaction):
-        self.timeout = None
         mid = interaction.message.id
         index = SPLATOON_INDEX[mid]['index']
         mode = SPLATOON_INDEX[mid]['mode']
         return mid, index, mode
 
-    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def prev_button_callback(self, interaction, button):
         mid, index, mode = self.get_msg(interaction)
         if index - 1 < 0: index = 0
@@ -26,7 +25,7 @@ class SplatoonButton(discord.ui.View):
 
         await interaction.response.edit_message(content = '', embeds=embeds, view=self)
     
-    @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary, timeout=None)
     async def next_button_callback(self, interaction, button):
         mid, index, mode = self.get_msg(interaction)
         if mode == 'big run' or mode == 'pve team':
