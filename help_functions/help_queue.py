@@ -5,6 +5,7 @@ from os.path import exists
 from yt_dlp import YoutubeDL
 from pytube import Playlist, YouTube as yt
 from bilibili_api import video as bilibili_video
+import asyncio
 
 import json 
 
@@ -103,6 +104,7 @@ def check_queue(ctx, id):
         else:
             while True:
                 try:
+                    await asyncio.sleep(1.5)
                     cur_info = song_queue[id].pop(0)
                     try:    url = cur_info.watch_url
                     except: url = cur_info['url']

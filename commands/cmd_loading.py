@@ -5,6 +5,8 @@ from discord import FFmpegPCMAudio
 from yt_dlp import YoutubeDL
 from help_functions.help_queue import *
 from os.path import exists
+from bilibili_api import video as bilibili_video
+
 
 from commands import cmd_play, cmd_play_music
 
@@ -48,10 +50,43 @@ async def save_url_to_file(ctx, url, bot):
     # with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
     # if "playlist?list=" not in url: msg.edit(embed=str_not_playlist); return
 
-    try:        playlist = Playlist(url)
-    except:     msg.edit(embed=str_not_playlist); return
+    try:        
+        playlist = Playlist(url)
+        title = playlist.title
+    except:     
+        if 'bilibili' in url:
+            try:
+                bv, p = None, None
+                for i in url.split('&')[0].split('/'):
+                    if 'BV' in i:   
+                        if '?p=' in i:
+                            bv = i.split('?p=')[0]
+                            p = i.split('?p=')[1]
+                        else:
+                            bv = i
+                        break
+                if bv == None:  raise "Error"
+
+                # Get the video url
+                link = 'https://www.bilibili.com/video/' + bv
+
+                # Get the video info
+                v = bilibili_video.Video(bvid=bv)
+                info = await v.get_info()
+                video_num = info['videos']
+                videos = info['pages']
+
+                if video_num == 1:  raise "Error"
+                if p is not None:   raise "Error"
+
+                title = videos[0]['part']
+                if ' p0' in title:  title = title[:title.index('p0')]
+                elif ' p1' in title:title = title[:title.index('p1')]
+            except: msg.edit(embed=str_not_playlist); return
+        else:       msg.edit(embed=str_not_playlist); return
+            
 
     with open(f'./QueueLog/UserPlaylist/{ctx.author.id}.json', 'w') as f:   f.write(url)
 
-    str_save_playlist = discord.Embed(title=f'专辑{playlist.title}保存到播放列表了捏！', description="", color=0x8B4C39)
+    str_save_playlist = discord.Embed(title=f'专辑{title}保存到播放列表了捏！', description="", color=0x8B4C39)
     await msg.edit(embed=str_save_playlist)
