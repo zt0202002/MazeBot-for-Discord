@@ -268,4 +268,38 @@ async def splatoon(ctx, mode: Literal['regular', 'rank', 'open_rank', 'x_rank', 
     await ctx.interaction.response.defer(thinking=True)
     await cmd_splatoon.splatoon(ctx, mode)
 
-bot.run(os.getenv('TOKEN2'))
+@bot.hybrid_command(with_app_command=True, name = 'status_set', description='Change User Status on Nickname')
+async def status_set(ctx, member: discord.Member, status:str):
+    if '[' in member.nick and ']' in member.nick:
+        index_0 = member.nick.index('[')
+        index_1 = member.nick.index(']')
+
+        if index_0 == 0:    nick = '[' + status + ']' + member.nick[index_1+1:]
+        else:               nick = '[' + status + ']' + member.nick
+
+    else:
+        nick = '[' + status + ']' + member.nick
+
+
+    await member.edit(nick=nick)
+    await ctx.send(f'Nickname was changed for {member.mention} ')
+
+@bot.hybrid_command(with_app_command=True, name = 'status_remove', description='Remove User Status on Nickname')
+async def status_set(ctx, member: discord.Member):
+    if '[' in member.nick and ']' in member.nick:
+        index_0 = member.nick.index('[')
+        index_1 = member.nick.index(']')
+
+        if index_0 == 0:    nick = member.nick[index_1+1:]
+        else:               
+            await ctx.send(f'You do not have status currently.')
+            return
+
+
+        await member.edit(nick=nick)
+        await ctx.send(f'Nickname was changed for {member.mention} ')
+    else:               
+        await ctx.send(f'You do not have status currently.')
+        return
+
+bot.run(os.getenv('TOKEN'))
