@@ -52,7 +52,8 @@ async def play_music(ctx, bot, msg, new_song_len):
     # 如果当前有歌曲播放，且如果只有一首新歌，print出来这首歌的名字和url
     elif new_song_len == 1:
         new_song = song_queue[ctx.guild.id][cur_len - 1]
-        embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song.title}\n{new_song.watch_url}', color=0x8B4C39)
+        try:    embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song.title}\n{new_song.watch_url}', color=0x8B4C39)
+        except: embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song["title"]}\n{new_song["webpage_url"]}', color=0x8B4C39)
         if msg is None: await ctx.channel.send(embed=embedVar)
         else:           await msg.edit(content='', embed=embedVar)
         is_edit_msg = True

@@ -110,17 +110,18 @@ class QueueButton(discord.ui.View):
         gid, index = self.get_msg(interaction)
         queue_list = await load_queue(interaction)
 
-        for i in range(len(queue_list)):
-            try:
-                try:    title = queue_list[i]['title']
-                except: 
-                    title = queue_list[i].title
-                    if 'Error Title |' not in title:    continue
-                    video = yt(queue_list[i].url)
-                    title = video.title
-                    queue_list[i].title = title
-            except Exception as e:
-                queue_list[i].title = 'Error Title | Title will show by Fresh button'
+        if queue_list != None:
+            for i in range(len(queue_list)):
+                try:
+                    try:    title = queue_list[i]['title']
+                    except: 
+                        title = queue_list[i].title
+                        if 'Error Title |' not in title:    continue
+                        video = yt(queue_list[i].url)
+                        title = video.title
+                        queue_list[i].title = title
+                except Exception as e:
+                    queue_list[i].title = 'Error Title | Title will show by Fresh button'
 
         await interaction.response.edit_message(content = '', embed=await convert_queue_to_embed(interaction, queue_list, QUEUE_INDEX[gid]), view=self)
 
