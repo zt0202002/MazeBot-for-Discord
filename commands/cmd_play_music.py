@@ -41,7 +41,7 @@ async def play_music(ctx, bot, msg, new_song_len):
         current_song[ctx.guild.id] = temp
         timer = check_time(temp)
         source = FFmpegPCMAudio(cur_info['url'], **FFMPEG_OPTIONS)
-        voice.play(source, after=lambda x=0: check_queue(ctx, ctx.guild.id))
+        voice.play(source, after=lambda x=0: await check_queue(ctx, ctx.guild.id))
         embedVar = discord.Embed(title=f'我来播放这首歌了捏！', description=f'{cur_info["title"]}\n[{timer[0]}/{timer[1]}]\n{cur_info["webpage_url"]}', color=0x8B4C39)
         
         if msg is None: await ctx.channel.send(embed=embedVar)

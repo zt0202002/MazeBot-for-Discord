@@ -96,7 +96,7 @@ async def addToQueue(guild, ctx=None, url = None):
     #     except:
     #         return False
 
-def check_queue(ctx, id):
+async def check_queue(ctx, id):
     if song_queue[id] != []:
         voice = ctx.guild.voice_client
         if len(song_queue[id]) == 0:    return None
