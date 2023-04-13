@@ -172,6 +172,10 @@ async def send_gpt_msg(message, bot, cb, longquery=''):
         await message.reply(embed=errorembed)
         await message.add_reaction("💩")
 
+        print('====================')
+        print(error)
+        print('====================')
+
     # await bot.process_commands(message)
 
 '''
