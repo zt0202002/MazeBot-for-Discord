@@ -24,7 +24,7 @@ async def play_music(ctx, bot, msg, new_song_len):
 
     # 没有歌曲播放的话，就播放queue中的第一首歌
     if not voice.is_playing():
-        await asyncio.sleep(1.5)
+        await asyncio.sleep(2)
         cur_info = song_queue[ctx.guild.id].pop(0)
 
         try:    url = cur_info.watch_url
@@ -41,7 +41,7 @@ async def play_music(ctx, bot, msg, new_song_len):
         current_song[ctx.guild.id] = temp
         timer = check_time(temp)
         source = FFmpegPCMAudio(cur_info['url'], **FFMPEG_OPTIONS)
-        voice.play(source, after=lambda x=0: asyncio.run(await check_queue(ctx, ctx.guild.id)))
+        voice.play(source, after=lambda x=0: check_queue(ctx, ctx.guild.id))
         embedVar = discord.Embed(title=f'我来播放这首歌了捏！', description=f'{cur_info["title"]}\n[{timer[0]}/{timer[1]}]\n{cur_info["webpage_url"]}', color=0x8B4C39)
         
         if msg is None: await ctx.channel.send(embed=embedVar)
