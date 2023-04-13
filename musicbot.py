@@ -271,15 +271,18 @@ async def splatoon(ctx, mode: Literal['regular', 'rank', 'open_rank', 'x_rank', 
 @bot.hybrid_command(with_app_command=True, name = 'status_set', description='Change User Status on Nickname')
 async def status_set(ctx, status:str):
     member = ctx.author
-    if '[' in member.nick and ']' in member.nick:
-        index_0 = member.nick.index('[')
-        index_1 = member.nick.index(']')
+    try:
+        if '[' in member.nick and ']' in member.nick:
+            index_0 = member.nick.index('[')
+            index_1 = member.nick.index(']')
 
-        if index_0 == 0:    nick = '[' + status + ']' + member.nick[index_1+1:]
-        else:               nick = '[' + status + ']' + member.nick
+            if index_0 == 0:    nick = '[' + status + ']' + member.nick[index_1+1:]
+            else:               nick = '[' + status + ']' + member.nick
 
-    else:
-        nick = '[' + status + ']' + member.nick
+        else:
+            nick = '[' + status + ']' + member.nick
+    except:
+        nick = '[' + status + ']' + member.name
 
 
     await member.edit(nick=nick)
@@ -288,20 +291,23 @@ async def status_set(ctx, status:str):
 @bot.hybrid_command(with_app_command=True, name = 'status_remove', description='Remove User Status on Nickname')
 async def status_set(ctx):
     member = ctx.author
-    if '[' in member.nick and ']' in member.nick:
-        index_0 = member.nick.index('[')
-        index_1 = member.nick.index(']')
+    try:
+        if '[' in member.nick and ']' in member.nick:
+            index_0 = member.nick.index('[')
+            index_1 = member.nick.index(']')
 
-        if index_0 == 0:    nick = member.nick[index_1+1:]
+            if index_0 == 0:    nick = member.nick[index_1+1:]
+            else:               
+                await ctx.send(f'You do not have status currently.')
+                return
+
+
+            await member.edit(nick=nick)
+            await ctx.send(f'Nickname was changed for {member.mention} ')
         else:               
             await ctx.send(f'You do not have status currently.')
             return
-
-
-        await member.edit(nick=nick)
-        await ctx.send(f'Nickname was changed for {member.mention} ')
-    else:               
+    except:
         await ctx.send(f'You do not have status currently.')
-        return
 
 bot.run(os.getenv('TOKEN'))
