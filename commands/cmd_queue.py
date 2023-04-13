@@ -149,11 +149,6 @@ async def queue(ctx, bot, msg=None):
     QUEUE_INDEX[ctx.guild.id] = 0
     if ctx.guild.id not in QUEUE_ID:  QUEUE_ID.append(ctx.guild.id)
 
-    PLAY_BUTTON = 'Pause' if current_song[msg.guild.id]['status'] == 'playing' else 'Resume'
-    NEXT_BUTTON = False if QUEUE_INDEX[msg.guild.id] < len(queue_list) - NEXT_PAGE else True
-    PREV_BUTTON = False if QUEUE_INDEX[msg.guild.id] > 0 else True
-    
-
     await msg.edit(
                     content = '', 
                     embed=await convert_queue_to_embed(ctx, queue_list, 0), 

@@ -25,17 +25,12 @@ async def play_music(ctx, bot, msg, new_song_len):
 
     # 没有歌曲播放的话，就播放queue中的第一首歌
     if not voice.is_playing():
-        await asyncio.sleep(2)
+        await asyncio.sleep(1.5)
         cur_info = song_queue[ctx.guild.id].pop(0)
 
         try:    url = cur_info.watch_url
         except: url = cur_info['url']
         with YoutubeDL(YDL_OPTIONS) as ydl: cur_info = ydl.extract_info(url, download=False)
-        
-        # print(cur_info['url'])
-        # print(cur_info['title'])
-        # print(cur_info['webpage_url'])
-        
 
         temp = {}; temp['info'] = cur_info; temp['time'] = datetime.now(); temp['status'] = 'playing'
         temp['pauseTime'] = -1
@@ -43,7 +38,7 @@ async def play_music(ctx, bot, msg, new_song_len):
         timer = check_time(temp)
         source = FFmpegPCMAudio(cur_info['url'], **FFMPEG_OPTIONS)
         voice.play(source, after=lambda x=0: check_queue(ctx, ctx.guild.id))
-        embedVar = discord.Embed(title=f'我来播放这首歌了捏！', description=f'{cur_info["title"]}\n[{timer[0]}/{timer[1]}]\n{cur_info["webpage_url"]}', color=0x8B4C39)
+        embedVar = discord.Embed(title=f'我来播放这首歌了捏！', description=f'{cur_info["title"]}\n[{timer[0]}/{timer[1]}]\n{url}', color=0x8B4C39)
         
         if msg is None: await ctx.channel.send(embed=embedVar)
         else:           await msg.edit(content='', embed=embedVar)
