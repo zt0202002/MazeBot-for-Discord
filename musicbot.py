@@ -269,7 +269,8 @@ async def splatoon(ctx, mode: Literal['regular', 'rank', 'open_rank', 'x_rank', 
     await cmd_splatoon.splatoon(ctx, mode)
 
 @bot.hybrid_command(with_app_command=True, name = 'status_set', description='Change User Status on Nickname')
-async def status_set(ctx, member: discord.Member, status:str):
+async def status_set(ctx, status:str):
+    member = ctx.author
     if '[' in member.nick and ']' in member.nick:
         index_0 = member.nick.index('[')
         index_1 = member.nick.index(']')
@@ -285,7 +286,8 @@ async def status_set(ctx, member: discord.Member, status:str):
     await ctx.send(f'Nickname was changed for {member.mention} ')
 
 @bot.hybrid_command(with_app_command=True, name = 'status_remove', description='Remove User Status on Nickname')
-async def status_set(ctx, member: discord.Member):
+async def status_set(ctx):
+    member = ctx.author
     if '[' in member.nick and ']' in member.nick:
         index_0 = member.nick.index('[')
         index_1 = member.nick.index(']')
