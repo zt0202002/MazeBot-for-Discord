@@ -108,10 +108,9 @@ class QueueButton(discord.ui.View):
     async def refresh_button_callback(self, interaction, button):
         button.view.timeout = None
         gid, index = self.get_msg(interaction)
-        queue_list = await load_queue(interaction)            
+        queue_list = await load_queue(interaction)
 
-
-        for i in range(1: len(queue_list)):
+        for i in range(1, len(queue_list)):
             try:
                 try:    title = queue_list[i]['title']
                 except: 
