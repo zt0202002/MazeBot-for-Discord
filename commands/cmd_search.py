@@ -23,8 +23,12 @@ class SeachButton(discord.ui.View):
         msg_id = interaction.message.id
         infos = SEARCH_QUEUE[msg_id]
         index = SEARCH_INDEX[msg_id]
+
+        self.mid = msg_id
         return  msg_id, infos, index
     
+    def Is_bot(self, m):    return m.id == self.mid
+
     @discord.ui.button(label="1", row=0, style=discord.ButtonStyle.primary)
     async def first_button_callback(self, interaction, button):
         button.view.timeout = None
@@ -92,7 +96,7 @@ class SeachButton(discord.ui.View):
         await interaction.response.edit_message(content = '', embed=queue_list_embed, view=self)
 
 
-    @discord.ui.button(label="Prev", row=1, style=discord.ButtonStyle.success)
+    @discord.ui.button(label="<", row=1, style=discord.ButtonStyle.success)
     async def next_button_callback(self, interaction, button):
         button.view.timeout = None
         msg_id, infos, index = self.get_msg(interaction)
@@ -109,7 +113,7 @@ class SeachButton(discord.ui.View):
 
         # await interaction.message.edit(content="You pressed me!") 
 
-    @discord.ui.button(label="Next", row=1, style=discord.ButtonStyle.success)
+    @discord.ui.button(label=">", row=1, style=discord.ButtonStyle.success)
     async def prev_button_callback(self, interaction, button):
         button.view.timeout = None
         msg_id, infos, index = self.get_msg(interaction)
@@ -124,10 +128,19 @@ class SeachButton(discord.ui.View):
             queue_list_embed = await conver_search_queue_to_embed(infos, index)
             await interaction.response.edit_message(content = '', embed=queue_list_embed, view=self)
     
-    
+    @discord.ui.button(label="X", row=1, style=discord.ButtonStyle.danger)
+    async def delete_button_callback(self, interaction, button):
+        button.view.timeout = None
+        msg_id, infos, index = self.get_msg(interaction)
+
+        SEARCH_QUEUE.pop(msg_id)
+        SEARCH_INDEX.pop(msg_id)
+        
+        await interaction.channel.purge(limit=100, check=self.Is_bot)
+
 
 async def search(ctx, request, bot, msg=None):
-    global SEARCH_INDEX, SEARCH_QUEUE, SEARCH_MSG_ID
+    global SEARCH_INDEX, SEARCH_QUEUE
     voice = get(bot.voice_clients, guild=ctx.guild)
     if msg is not None: channel = ctx.author.voice.channel
     else:   channel = ctx.message.author.voice.channel
@@ -246,5 +259,5 @@ async def conver_search_queue_to_embed(infos, start, end=NEXT_PAGE):
     if start + end > len(infos): end = len(infos)
     else: end += start
     for i in range(start, end):
-        embedVar.add_field(name=f'**[{i+1}] {infos[i].title}**', value=f'{infos[i].watch_url}', inline=False)
+        embedVar.add_field(name=f'**[{i+1-start}] {infos[i].title}**', value=f'{infos[i].watch_url}', inline=False)
     return embedVar

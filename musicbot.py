@@ -254,6 +254,16 @@ async def bangumi(ctx, *, query: str):
     await ctx.interaction.response.defer(thinking=True)
     await cmd_googlesearch.bangumi(ctx, query)
 
+@bot.hybrid_command(with_app_command=True, name = 'image', description='Google Image Search')
+async def google_image(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.image(ctx, query)
+
+@bot.hybrid_command(with_app_command=True, name = 'gif', description='Google gif image Search')
+async def google_gif(ctx, *, query: str):
+    await ctx.interaction.response.defer(thinking=True)
+    await cmd_googlesearch.gif(ctx, query)
+
 @bot.hybrid_command(with_app_command=True, name = 'news', description='今日要闻')
 async def news(ctx, type: Literal['World', 'Video Game']):    
     if type == 'World':
@@ -284,9 +294,11 @@ async def status_set(ctx, status:str):
     except:
         nick = '[' + status + ']' + member.name
 
-
-    await member.edit(nick=nick)
-    await ctx.send(f'Nickname was changed for {member.mention} ')
+    try:
+        await member.edit(nick=nick)
+        await ctx.send(f'Nickname was changed for {member.mention} ')
+    except:
+        await ctx.send(f'Nickname was not changed for {member.mention}. Please make sure bot position is above the user.')
 
 @bot.hybrid_command(with_app_command=True, name = 'status_remove', description='Remove User Status on Nickname')
 async def status_set(ctx):
@@ -310,4 +322,4 @@ async def status_set(ctx):
     except:
         await ctx.send(f'You do not have status currently.')
 
-bot.run(os.getenv('TOKEN'))
+bot.run(os.getenv('TOKEN2'))

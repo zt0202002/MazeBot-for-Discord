@@ -32,6 +32,8 @@ async def play(ctx, url, bot, msg = None):
     if msg is None: msg = await ctx.send(embed=str_loading_song)   
 
     new_song_len = await addToQueue(ctx.guild, url = url)
-    
+
+
+
     if not new_song_len:    await msg.edit(content='', embed=str_invalid_url)
     else:                   await cmd_play_music.play_music(ctx, bot, msg, new_song_len)

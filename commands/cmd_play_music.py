@@ -11,6 +11,7 @@ from commands import cmd_search
 import asyncio
 
 import validators
+from pytube import Playlist, YouTube as yt
 
 async def play_music(ctx, bot, msg, new_song_len):
     # voice = get(bot.voice_clients, guild=ctx.guild)
@@ -62,3 +63,20 @@ async def play_music(ctx, bot, msg, new_song_len):
         embedVar = discord.Embed(title=f'已经将{new_song_len}首歌加入到播放列表了捏！', description="", color=0x8B4C39)
         if is_edit_msg or msg is None: await ctx.channel.send(embed=embedVar)
         else:           await msg.edit(content='', embed=embedVar)
+
+    try:    await asyncio.wait_for(check_queue_correct(ctx.guild.id), timeout=5)
+    except: pass
+    
+async def check_queue_correct(gid):
+    for i in range(len(song_queue[gid])):
+        try:
+            try:    url = song_queue[gid][i].watch_url
+            except: url = song_queue[gid][i]['url']
+
+            try:    title = song_queue[gid][i].title
+            except: title = song_queue[gid][i]['title']
+        except:
+            try:    
+                video = await asyncio.wait_for(asyncio.to_thread(yt, url), timeout=1)
+                song_queue[gid][i].title = video.title
+            except: song_queue[gid].pop(i)

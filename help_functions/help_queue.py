@@ -74,27 +74,21 @@ async def addToQueue(guild, ctx=None, url = None):
     else:
         try:
             playlist = Playlist(url)
+            length = 0
+            error_rate = 0
             assert len(playlist.videos) > 0
             for video in playlist.videos:
-                song_queue[guild.id].append(video)
-            return len(playlist.videos)
-        except:
+                cur_video = video
+                length += 1
+                song_queue[guild.id].append(cur_video)
+            return length
+        except Exception as e:
             try:
                 video = yt(url)
                 song_queue[guild.id].append(video)
                 return 1
             except:
                 return False
-    # else:
-    #     try:
-    #         if "entries" in song:
-    #             for i in song['entries']:
-    #                 song_queue[guild.id].append(i)
-    #         else:
-    #             song_queue[guild.id].append(song)
-    #         return 1
-    #     except:
-    #         return False
 
 def check_queue(ctx, id):
     if song_queue[id] != []:

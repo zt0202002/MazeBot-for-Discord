@@ -9,30 +9,44 @@ GOOGLE_SEARCH_INDEX = {}
 class GoogleSearchButton(discord.ui.View):
     global GOOGLE_SEARCH_INDEX
 
+    def __init__(self, *, timeout= None):
+        super().__init__(timeout=timeout)
+
     def get_msg(self, interaction):
         gid = interaction.message.id
         index, queue = GOOGLE_SEARCH_INDEX[gid]['index'], GOOGLE_SEARCH_INDEX[gid]['queue']
         type, query = GOOGLE_SEARCH_INDEX[gid]['type'], GOOGLE_SEARCH_INDEX[gid]['query']
+        self.mid = gid
         return gid, index, queue, type, query
     
-    @discord.ui.button(label="Prev", row=0, style=discord.ButtonStyle.primary)
+    def Is_bot(self, m):  return m.id == self.mid
+    
+    @discord.ui.button(label="<", row=0, style=discord.ButtonStyle.primary)
     async def prev_button_callback(self, interaction, button):
         button.view.timeout = None
         gid, index, queue, type, query = self.get_msg(interaction)
-        if index - 3 < 0:   index = 0
-        else:   index -= 3
+        if 'Image' not in type:
+            if index - 3 < 0:   index = 0
+            else:   index -= 3
+        else:
+            if index - 1 < 0:   index = 0
+            else:   index -= 1
 
         GOOGLE_SEARCH_INDEX[gid]['index'] = index
 
         embedVar, a, b = await search_result_embed(query, queue, type, index)
         await interaction.response.edit_message(content = '', embed=embedVar, view=self)
     
-    @discord.ui.button(label="Next", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label=">", row=0, style=discord.ButtonStyle.primary)
     async def next_button_callback(self, interaction, button):
         button.view.timeout = None
         gid, index, queue, type, query = self.get_msg(interaction)
-        if index + 3 >= len(queue):     index = len(queue) - 3
-        else:                           index += 3
+        if 'Image' not in type:
+            if index + 3 >= len(queue):     index = len(queue) - 3
+            else:                           index += 3
+        else:
+            if index + 1 >= len(queue):     index = len(queue) - 1
+            else:                           index += 1
 
         if index < 0:   index = 0
 
@@ -41,22 +55,42 @@ class GoogleSearchButton(discord.ui.View):
         embedVar, a, b = await search_result_embed(query, queue, type, index)
         await interaction.response.edit_message(content = '', embed=embedVar, view=self)
 
+    @discord.ui.button(label="x", row=0, style=discord.ButtonStyle.danger)
+    async def delete_button_callback(self, interaction, button):
+        button.view.timeout = None
+        gid, index, queue, type, query = self.get_msg(interaction)
+        del GOOGLE_SEARCH_INDEX[gid]
+        await interaction.channel.purge(limit=100, check=self.Is_bot)
+        
 
 async def search_result_embed(query, results, type, index):
     embedVar = discord.Embed(title=f'{type} Search Results for {query}', description='', color=0x8B4C39)
 
-    for i, item in enumerate(results):
-        if i < index:   continue
-        if i >= index + 3:  break
-        embedVar.add_field(name=f"**{i+1}. {item['title']}**", value=f"{item['snippet']}\n{item['link']}", inline=False)
+    if 'Image' not in type:
+        for i, item in enumerate(results):
+            if i < index:   continue
+            if i >= index + 3:  break
+            embedVar.add_field(name=f"**{i+1}. {item['title']}**", value=f"{item['snippet']}\n{item['link']}", inline=False)
+
+    else:   embedVar.set_image(url=results[index]['link'])
 
     return embedVar, index, results
 
 async def google_search_func(query, cx, type, num_results=9, index=0):
     api_key = os.getenv('GOOGLE_SEARCH_API')
-
     service = build("customsearch", "v1", developerKey=api_key)
-    response = service.cse().list(q=query, cx=cx, num=num_results).execute()
+    if 'Image' not in type:   
+        response = service.cse().list(q=query, cx=cx, num=num_results).execute()
+
+    else:
+        fileType = 'jpg&img;png&img;bmp&img;gif&img'
+        if 'GIF' in type:   fileType = 'gif'
+        response = service.cse().list(q=query, 
+                                      cx=cx, 
+                                      searchType='image', 
+                                      num=num_results, 
+                                      fileType=fileType,
+                                      fields='items/link, queries').execute()
 
     results = response['items']
 
@@ -107,6 +141,16 @@ async def bangumi(ctx, query):
     cx = os.getenv('CX_BANGUMI')
     embedVar, index, results = await google_search_func(query, cx, 'Bangumi')
     await reply_google_search(ctx, query, 'Bangumi', embedVar, index, results)
+
+async def image(ctx, query):
+    cx = os.getenv('CX_GOOGLE')
+    embedVar, index, results = await google_search_func(query, cx, 'Image')
+    await reply_google_search(ctx, query, 'Image', embedVar, index, results)
+
+async def gif(ctx, query):
+    cx = os.getenv('CX_GOOGLE')
+    embedVar, index, results = await google_search_func(query, cx, 'Image GIF')
+    await reply_google_search(ctx, query, 'Image GIF', embedVar, index, results)
 
 async def news(ctx):
     try:

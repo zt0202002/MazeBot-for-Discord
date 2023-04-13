@@ -10,7 +10,7 @@ CURRENT_ID = []
 
 class CurrentButton(discord.ui.View):
 
-    @discord.ui.button(label="Play | Paus", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="⏯", row=0, style=discord.ButtonStyle.primary)
     async def resume_button_callback(self, interaction, button):
         self.timeout = None
         button = await resume(interaction, interaction.client, interaction.message)
@@ -19,7 +19,7 @@ class CurrentButton(discord.ui.View):
         embedvar = await current(interaction, interaction.client, interaction.message)
         await interaction.response.edit_message(content = '', embed=embedvar, view=self)
 
-    @discord.ui.button(label="Skip", row=0, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Skip", row=0, style=discord.ButtonStyle.success)
     async def skip_button_callback(self, interaction, button):
         self.timeout = None
         await skip(interaction, interaction.client, interaction.message)
@@ -27,11 +27,17 @@ class CurrentButton(discord.ui.View):
         embedvar = await current(interaction, interaction.client, interaction.message)
         await interaction.response.edit_message(content = '', embed=embedvar, view=self)
 
-    @discord.ui.button(label="Load", row=0, style=discord.ButtonStyle.success)
+    @discord.ui.button(label="Fresh", row=0, style=discord.ButtonStyle.success)
     async def refresh_button_callback(self, interaction, button):
         self.timeout = None
         embedvar = await current(interaction, interaction.client, interaction.message)
         await interaction.response.edit_message(content = '', embed=embedvar, view=self)
+
+    @discord.ui.button(label="x", row=0, style=discord.ButtonStyle.danger)
+    async def delete_button_callback(self, interaction, button):
+        self.timeout = None
+        mid = interaction.message.id
+        await interaction.channel.purge(limit=100, check=lambda m: m.id == mid)
 
 async def current(ctx, bot, msg=None, gpt=False):
     voice = get(bot.voice_clients, guild=ctx.guild)
