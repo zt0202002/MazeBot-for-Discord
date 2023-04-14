@@ -198,8 +198,8 @@ async def load_queue(msg):
         # msg = await msg.edit(content = '', embed=str_not_song_playing)
         return None
     else:
-        current = current_song[msg.guild.id]['info']
-        timer = check_time(current_song[msg.guild.id])
+        # current = current_song[msg.guild.id]['info']
+        # timer = check_time(current_song[msg.guild.id])
 
         queue_list.append(current_song[msg.guild.id])
         for i in range(len(song_queue[msg.guild.id])):
