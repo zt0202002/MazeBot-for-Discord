@@ -103,8 +103,14 @@ async def on_message(message, bot, interaction=None):
     if ((did not in chatgpt.CHAT_CHANNEL_ID)
         and not message.content.startswith('!') and not message.content.startswith('！')
         and not message.content.startswith(';') and not message.content.startswith('；')): 
+    
         await bot.process_commands(message)
         return
+    
+    if (message.content.startswith('!') or message.content.startswith('！')
+        or message.content.startswith(';') or message.content.startswith('；')):
+            
+        message.content = message.content[1:]
         
     # if message.content == '!refresh': chatbot.refresh_session(); await message.add_reaction("🔄"); print("refresh session"); return
     # if message.content == '!restart' and message.author.id == config['discord_admin_id']: os.execl(__file__, *sys.argv);return
