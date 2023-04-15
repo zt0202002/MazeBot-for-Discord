@@ -13,8 +13,8 @@ import validators
 
 async def play(ctx, url, bot, msg = None):
     voice = get(bot.voice_clients, guild=ctx.guild)
-    try:    channel = ctx.message.channel
-    except: channel = ctx.author.voice.channel
+    try:    channel = ctx.author.voice.channel
+    except: channel = ctx.message.channel
 
     if voice is None:
         msg = await join(ctx, bot, msg)
