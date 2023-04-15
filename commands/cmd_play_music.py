@@ -34,7 +34,7 @@ async def play_music(ctx, bot, msg, new_song_len):
                 if 'webpage_url' in cur_info:   url = cur_info['webpage_url']
                 else:                           url = cur_info['url']
 
-            if len(song_queue[ctx.guild.id]) == 0:
+            if len(song_queue[ctx.guild.id]) != 0:
                 cur_info = song_queue[ctx.guild.id].pop(0)
             else:
                 break

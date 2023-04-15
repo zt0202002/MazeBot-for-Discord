@@ -104,7 +104,7 @@ def check_queue(ctx, id):
                     if 'webpage_url' in cur_info:       url = cur_info['webpage_url']
                     else:                               url = cur_info['url']
 
-                if len(song_queue[ctx.guild.id]) == 0:  info = song_queue[ctx.guild.id].pop(0)
+                if len(song_queue[ctx.guild.id]) != 0:  info = song_queue[ctx.guild.id].pop(0)
                 else:                                   break
 
             with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
