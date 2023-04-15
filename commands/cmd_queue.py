@@ -130,7 +130,7 @@ class QueueButton(discord.ui.View):
 
         button.view.timeout = None
         gid, index = self.get_msg(interaction)
-        QUEUE_ID.remove(gid)
+        if gid in QUEUE_ID: QUEUE_ID.remove(gid)
         
         await interaction.channel.purge(limit=100, check=Is_bot)
 
