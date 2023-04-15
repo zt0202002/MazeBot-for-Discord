@@ -37,6 +37,10 @@ async def play_music(ctx, bot, msg, new_song_len):
                 break
             except:
                 cur_info = song_queue[ctx.guild.id].pop(0)
+        if url is None:
+            print('ERROR: WRONG MUSIC URL')
+            return
+
         with YoutubeDL(YDL_OPTIONS) as ydl: cur_info = ydl.extract_info(url, download=False)
 
         temp = {}; temp['info'] = cur_info; temp['time'] = datetime.now(); temp['status'] = 'playing'
@@ -56,7 +60,9 @@ async def play_music(ctx, bot, msg, new_song_len):
         new_song = song_queue[ctx.guild.id][cur_len - 1]
 
         try:    url = new_song.watch_url
-        except: url = new_song['url']
+        except: 
+            if 'webpage_url' in new_song:   url = new_song['webpage_url']
+            else:                   url = new_song['url']
         
         try:    embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song.title}\n{url}', color=0x8B4C39)
         except: embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song["title"]}\n{url}', color=0x8B4C39)
