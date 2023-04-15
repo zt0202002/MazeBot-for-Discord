@@ -8,6 +8,9 @@ SPLATOON_INDEX={}
 class SplatoonButton(discord.ui.View):
     global SPLATOON_INDEX
 
+    def __init__(self, *, timeout=None):
+        super().__init__(timeout=timeout)
+
     def get_msg(self, interaction):
         mid = interaction.message.id
         index = SPLATOON_INDEX[mid]['index']
@@ -41,6 +44,10 @@ class SplatoonButton(discord.ui.View):
 
             await interaction.response.edit_message(content = '', embeds=embeds, view=self)
 
+    @discord.ui.button(label="x", row=0, style=discord.ButtonStyle.danger)
+    async def x_button_callback(self, interaction, button):
+        await interaction.channel.purge(limit=100, check = lambda m: m.id == interaction.message.id)
+
         
 def read_schedule(type, index = 0):
     def read_regular(regular, index=0):
@@ -48,7 +55,7 @@ def read_schedule(type, index = 0):
         endTime = regular[index]['endTime']
         vsStage_1 = regular[index]['regularMatchSetting']['vsStages'][0]
         vsStage_2 = regular[index]['regularMatchSetting']['vsStages'][1]
-        mode = regular[index]['regularMatchSetting']['vsRule']['name']
+        mode = regular[index]['regularMatchSetting']['vsRule']
 
         return {'startTime': startTime, 'endTime': endTime, 'vsStage': [vsStage_1, vsStage_2], 'mode': mode}
 
@@ -57,7 +64,7 @@ def read_schedule(type, index = 0):
         endTime = rank[index]['endTime']
         vsStage_1 = rank[index]['bankaraMatchSettings'][0]['vsStages'][0]
         vsStage_2 = rank[index]['bankaraMatchSettings'][0]['vsStages'][1]
-        mode = rank[index]['bankaraMatchSettings'][0]['vsRule']['name']
+        mode = rank[index]['bankaraMatchSettings'][0]['vsRule']
 
         # print(startTime, endTime, vsStage_1['name'], vsStage_2['name'], mode)
         return {'startTime': startTime, 'endTime': endTime, 'vsStage': [vsStage_1, vsStage_2], 'mode': mode}
@@ -67,7 +74,7 @@ def read_schedule(type, index = 0):
         endTime = rank[index]['endTime']
         vsStage_1 = rank[index]['bankaraMatchSettings'][1]['vsStages'][0]
         vsStage_2 = rank[index]['bankaraMatchSettings'][1]['vsStages'][1]
-        mode = rank[index]['bankaraMatchSettings'][1]['vsRule']['name']
+        mode = rank[index]['bankaraMatchSettings'][1]['vsRule']
 
         # print(startTime, endTime, vsStage_1['name'], vsStage_2['name'], mode)
         return {'startTime': startTime, 'endTime': endTime, 'vsStage': [vsStage_1, vsStage_2], 'mode': mode}
@@ -77,7 +84,7 @@ def read_schedule(type, index = 0):
         endTime = rank[index]['endTime']
         vsStage_1 = rank[index]['xMatchSetting']['vsStages'][0]
         vsStage_2 = rank[index]['xMatchSetting']['vsStages'][1]
-        mode = rank[index]['xMatchSetting']['vsRule']['name']
+        mode = rank[index]['xMatchSetting']['vsRule']
 
         return {'startTime': startTime, 'endTime': endTime, 'vsStage': [vsStage_1, vsStage_2], 'mode': mode}
 
@@ -133,7 +140,7 @@ def read_schedule(type, index = 0):
             pveTeam     = schedule['coopGroupingSchedule']['teamContestSchedules']['nodes']
             return read_pve_team(pveTeam, index)
     
-    return get_result(type, index)
+    return read_cn(get_result(type, index))
 
 async def get_splatoon_info(type, index=0):
     global SPLATOON_INDEX
@@ -141,11 +148,9 @@ async def get_splatoon_info(type, index=0):
     
     status = 'Current'
 
-    if index == 0:      status = 'Current'
-    elif index == 1:    status = 'Next'
-    elif index == 2:    status = '2nd Next'
-    elif index == 3:    status = '3rd Next'
-    else:               status = f'{index}th Next'
+    if index == 0:      status = '本次'
+    elif index == 1:    status = '下次'
+    else:               status = '之后'
 
     
     if result != None: 
@@ -158,17 +163,17 @@ async def get_splatoon_info(type, index=0):
         
         desc = f'{startTime} ~ {endTime}'
 
-    if type == 'regular': embed = discord.Embed(title=f'{status} Turf War | {result["mode"]}', description=desc, color=0x8B4C39)
-    elif type == 'rank': embed = discord.Embed(title=f'{status} Ranked Battle | {result["mode"]}', description=desc, color=0x8B4C39)
-    elif type == 'open_rank': embed = discord.Embed(title=f'{status} Open Ranked Battle | {result["mode"]}', description=desc, color=0x8B4C39)
-    elif type == 'x_rank': embed = discord.Embed(title=f'{status} X Ranked Battle | {result["mode"]}', description=desc, color=0x8B4C39)
-    elif type == 'pve': embed = discord.Embed(title=f'{status} PVE | {result["coopStage"]["name"]}', description=desc, color=0x8B4C39)
+    if type == 'regular': embed = discord.Embed(title=f'{status} {result["mode"]}', description=desc, color=0x8B4C39)
+    elif type == 'rank': embed = discord.Embed(title=f'{status} 真格模式 ｜ {result["mode"]}', description=desc, color=0x8B4C39)
+    elif type == 'open_rank': embed = discord.Embed(title=f'{status} 开放真格 | {result["mode"]}', description=desc, color=0x8B4C39)
+    elif type == 'x_rank': embed = discord.Embed(title=f'{status} X真格 | {result["mode"]}', description=desc, color=0x8B4C39)
+    elif type == 'pve': embed = discord.Embed(title=f'{status} 打工 | {result["coopStage"]["name"]}', description=desc, color=0x8B4C39)
     elif type == 'big run': 
-        if result == None:  embed = discord.Embed(title=f'{status} Big Run | None', description=f'', color=0x8B4C39)
-        else:               embed = discord.Embed(title=f'{status} Big Run | {result["coopStage"]["name"]}', description=desc, color=0x8B4C39)
+        if result == None:  embed = discord.Embed(title=f'{status} 大型跑 | 未知', description=f'', color=0x8B4C39)
+        else:               embed = discord.Embed(title=f'{status} 大型跑 | {result["coopStage"]["name"]}', description=desc, color=0x8B4C39)
     elif type == 'pve team': 
-        if result == None:  embed = discord.Embed(title=f'{status} Team PVE | None', description=f'', color=0x8B4C39)
-        else:               embed = discord.Embed(title=f'{status} Team PVE | {result["coopStage"]["name"]}', description=desc, color=0x8B4C39)
+        if result == None:  embed = discord.Embed(title=f'{status} 团队打工 | 未知', description=f'', color=0x8B4C39)
+        else:               embed = discord.Embed(title=f'{status} 团队打工 | {result["coopStage"]["name"]}', description=desc, color=0x8B4C39)
 
     embed.set_thumbnail(url='https://fedi.splatoon3.ink/media/9da32c20-8159-4f0d-bcda-6bae9f582545/Splatoon3%20Twitter%20avatar.png')
 
@@ -194,7 +199,34 @@ async def get_splatoon_info(type, index=0):
 
         embeds = [embed, embed1, embed2, embed3, embed4]
     return embeds
-        
+
+def read_cn(result):
+    if result is None:  return None
+    link = 'https://splatoon3.ink/data/locale/zh-CN.json'
+    response = requests.get(link)
+    translator = dict(response.json())
+
+    if 'vsStage' in result:
+        stages = translator['stages']
+        modes = translator['rules']
+
+        result['vsStage'][0]['name'] = stages[result['vsStage'][0]['id']]['name']
+        result['vsStage'][1]['name'] = stages[result['vsStage'][1]['id']]['name']
+
+        print(result['mode'])
+        print(modes[result['mode']['id']])
+        result['mode'] = modes[result['mode']['id']]['name']
+
+    else:
+        weapons = translator['weapons']
+        stage = translator['stages']
+
+        result['coopStage']['name'] = stage[result['coopStage']['id']]['name']
+
+        for i in range(4):
+            result['weapons'][i]['name'] = weapons[result['weapons'][i]['__splatoon3ink_id']]['name']
+
+    return result
 
 async def splatoon(ctx, type):
     embeds = await get_splatoon_info(type)
