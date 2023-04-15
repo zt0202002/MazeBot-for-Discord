@@ -28,18 +28,17 @@ async def play_music(ctx, bot, msg, new_song_len):
         await asyncio.sleep(1.5)
         cur_info = song_queue[ctx.guild.id].pop(0)
         url = None
-        while len(song_queue[ctx.guild.id]) > 0:
-            try:
-                try:    url = cur_info.watch_url
-                except: 
-                    if 'webpage_url' in cur_info:   url = cur_info['webpage_url']
-                    else:                           url = cur_info['url']
-                break
-            except:
+        while url is None:
+            try:    url = cur_info.watch_url
+            except: 
+                if 'webpage_url' in cur_info:   url = cur_info['webpage_url']
+                else:                           url = cur_info['url']
+
+            if len(song_queue[ctx.guild.id]) == 0:
                 cur_info = song_queue[ctx.guild.id].pop(0)
+            else:
+                break
         if url is None:
-            print(cur_info.keys())
-            print('ERROR: WRONG MUSIC URL')
             return
 
         with YoutubeDL(YDL_OPTIONS) as ydl: cur_info = ydl.extract_info(url, download=False)

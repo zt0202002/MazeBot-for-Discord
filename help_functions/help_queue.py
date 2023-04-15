@@ -97,23 +97,26 @@ def check_queue(ctx, id):
         if len(song_queue[id]) == 0:    return None
         elif not voice:                 return None
         else:
-            while True:
-                try:
-                    cur_info = song_queue[id].pop(0)
-                    try:    url = cur_info.watch_url
-                    except: 
-                        if 'webpage_url' in cur_info:   url = cur_info['webpage_url']
-                        else:                           url = cur_info['url']
-                    with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
-                    break
-                except:
-                    continue
+            url = None
+            while url is None:
+                try:                                    url = cur_info.watch_url
+                except: 
+                    if 'webpage_url' in cur_info:       url = cur_info['webpage_url']
+                    else:                               url = cur_info['url']
 
-            temp = {}; temp['info'] = info; temp['time'] = datetime.now();  temp['status'] = 'playing'
+                if len(song_queue[ctx.guild.id]) == 0:  info = song_queue[ctx.guild.id].pop(0)
+                else:                                   break
+
+            with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
+
+            temp = {}
+            temp['info'] = info; 
+            temp['time'] = datetime.now()
+            temp['status'] = 'playing'
             temp['pauseTime'] = -1
             current_song[id] = temp
-            URL = info['url']
-            source = FFmpegPCMAudio(URL, **FFMPEG_OPTIONS)
+
+            source = FFmpegPCMAudio(info['url'], **FFMPEG_OPTIONS)
             voice.play(source, after=lambda x=0: check_queue(ctx, id))
     else:
         current_song[id] = {}
