@@ -38,6 +38,7 @@ async def play_music(ctx, bot, msg, new_song_len):
             except:
                 cur_info = song_queue[ctx.guild.id].pop(0)
         if url is None:
+            print(cur_info.keys())
             print('ERROR: WRONG MUSIC URL')
             return
 
