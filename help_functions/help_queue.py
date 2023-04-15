@@ -134,10 +134,12 @@ async def save_queue_into_file(voice, id, path='ServerHistory'):
         temp_urls.append(current_song[id]['info']['webpage_url'])
         for i in song_queue[id]:    
             try:    temp_urls.append(i.watch_url)
-            except: temp_urls.append(i['url'])
+            except:
+                if 'webpage_url' in i:  temp_urls.append(i['webpage_url']) 
+                else:                   temp_urls.append(i['url'])
         
         with open(file, 'w') as f:  json.dump(temp_urls, f)
-        for i in range(len(song_queue)):  song_queue[id].pop(0)
+        while len(song_queue) != 0:  song_queue[id].pop(0)
         current_song[id] = {}
         
         return True
