@@ -9,3 +9,4 @@ test.py
 /QueueLog/*/*.json
 QueueLog/ServerHistory/963220885706244106.json
 *.json
+*.pyc
