@@ -31,7 +31,7 @@ async def addToQueue(guild, ctx=None, url = None):
             else:
                 song_queue[guild.id].append(info)
                 return 1
-        except:
+        except Exception as e:
             return False
     elif 'bilibili' in url:
         try:
@@ -78,6 +78,7 @@ async def addToQueue(guild, ctx=None, url = None):
             error_rate = 0
             assert len(playlist.videos) > 0
             for video in playlist.videos:
+                print(video.title)
                 cur_video = video
                 length += 1
                 song_queue[guild.id].append(cur_video)
@@ -100,7 +101,9 @@ def check_queue(ctx, id):
                 try:
                     cur_info = song_queue[id].pop(0)
                     try:    url = cur_info.watch_url
-                    except: url = cur_info['url']
+                    except: 
+                        if 'webpage_url' in cur_info:   url = cur_info['webpage_url']
+                        else:                           url = cur_info['url']
                     with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
                     break
                 except:
