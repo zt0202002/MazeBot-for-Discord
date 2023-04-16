@@ -59,13 +59,17 @@ async def play_music(ctx, bot, msg, new_song_len):
     elif new_song_len == 1:
         new_song = song_queue[ctx.guild.id][cur_len - 1]
 
-        try:    url = new_song.watch_url
-        except: 
-            if 'webpage_url' in new_song:   url = new_song['webpage_url']
-            else:                   url = new_song['url']
+        try:
+            try:    url = new_song.watch_url
+            except: 
+                if 'webpage_url' in new_song:   url = new_song['webpage_url']
+                else:                           url = new_song['url']
+
+            try:    embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song.title}\n{url}', color=0x8B4C39)
+            except: embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song["title"]}\n{url}', color=0x8B4C39)
+        except:
+            embedVar =  discord.Embed(title=f'当前歌曲未成功加载，我会在之后尝试加载的！', description=f'', color=0x8B4C39)
         
-        try:    embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song.title}\n{url}', color=0x8B4C39)
-        except: embedVar = discord.Embed(title=f'我把这首歌加入播放列表了捏！', description=f'[{cur_len+1}]\t{new_song["title"]}\n{url}', color=0x8B4C39)
         if msg is None: await ctx.channel.send(embed=embedVar)
         else:           await msg.edit(content='', embed=embedVar)
         is_edit_msg = True
