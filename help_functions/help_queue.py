@@ -100,14 +100,14 @@ def check_queue(ctx, id):
             url = None
             while url is None:
                 try:                                    
-                    url = song_queue[ctx.guild.id].watch_url
+                    url = song_queue[ctx.guild.id][0].watch_url
                 
                 except: 
-                    if 'webpage_url' in song_queue[ctx.guild.id]:       
-                        url = song_queue[ctx.guild.id]['webpage_url']
+                    if 'webpage_url' in song_queue[ctx.guild.id][0]:       
+                        url = song_queue[ctx.guild.id]['webpage_url'][0]
                     
                     else:                               
-                        url = song_queue[ctx.guild.id]['url']
+                        url = song_queue[ctx.guild.id]['url'][0]
 
                 if len(song_queue[ctx.guild.id]) != 0:  info = song_queue[ctx.guild.id].pop(0)
                 else:                                   break
