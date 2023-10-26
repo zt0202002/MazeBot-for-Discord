@@ -5,7 +5,7 @@ from revChatGPT.V3 import Chatbot
 
 from os.path import exists
 from dotenv import load_dotenv
-from commands import cmd_play, cmd_queue, cmd_join, cmd_current, cmd_resume, cmd_search, cmd_skip
+from commands.music import cmd_play, cmd_queue, cmd_join, cmd_current, cmd_resume, cmd_skip
 
 chatbot = {}
 CHAT_CHANNEL_ID = []
@@ -229,7 +229,7 @@ async def is_music_commands(ctx, bot, msg, response):
     # check valid commands
     if '\play' == response.split(' ')[0]:
         url = response.split(' ')[1]
-        await cmd_play.play(ctx, url, bot, msg)
+        await cmd_play.play(ctx, bot, url, msg)
     elif '\join' == response:
         await cmd_join.join(ctx, bot, msg)
     elif '\queue' == response:
@@ -240,7 +240,7 @@ async def is_music_commands(ctx, bot, msg, response):
         await cmd_resume.resume(ctx, bot, msg)
     elif '\search' == response.split(' ')[0] and len(response.split(' ')) > 1:
         content = response.split(' ')[1]
-        await cmd_search.search(ctx, content, bot, msg)
+        await cmd_play.search(ctx, bot, content, msg)
     elif '\pause' in response:
         await cmd_resume.pause(ctx, bot, msg)
     elif '\skip' in response:
