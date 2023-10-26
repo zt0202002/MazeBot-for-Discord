@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from discord.ext import commands
 import description as dp
+from typing import Literal
 
 from help_functions.help_text import *
 from help_functions.help_time import *
@@ -90,25 +91,25 @@ async def queue(ctx: commands.Context): await cmd_queue.queue(ctx)
 @bot.hybrid_command(with_app_command=True, name = 'search', description=dp.queue)
 async def queue(ctx: commands.Context, keywords: str): await cmd_play.search(ctx, bot, keywords)
 
-# 还没改完的音乐部分
-@bot.hybrid_command(with_app_command=True, name = 'delete', description=dp.delete)
-async def delete(ctx: commands.Context, index: int): await cmd_delete.delete(ctx, index, bot)
+# # 还没改完的音乐部分
+# @bot.hybrid_command(with_app_command=True, name = 'delete', description=dp.delete)
+# async def delete(ctx: commands.Context, index: int): await cmd_delete.delete(ctx, index, bot)
 
-@bot.hybrid_command(with_app_command=True, name = 'random', description=dp.random)
-async def random(ctx):  await cmd_random.randomQueue(ctx, bot)
+# @bot.hybrid_command(with_app_command=True, name = 'random', description=dp.random)
+# async def random(ctx):  await cmd_random.randomQueue(ctx, bot)
 
-@bot.hybrid_command(with_app_command=True, name = 'load', description=dp.loading)
-async def loading(ctx, *, action: Literal['Server History', 'Mine']):
-    embedVar = discord.Embed(title="现在就两个功能捏...", description="Please wait...", color=0x00ff00)
-    if action == 'Server History':  await cmd_loading.loading_queue(ctx, action, bot)
-    elif action == 'Mine':  await cmd_loading.loading_queue(ctx, action, bot)
-    else:  await ctx.send(embed = embedVar)
+# @bot.hybrid_command(with_app_command=True, name = 'load', description=dp.loading)
+# async def loading(ctx, *, action: Literal['Server History', 'Mine']):
+#     embedVar = discord.Embed(title="现在就两个功能捏...", description="Please wait...", color=0x00ff00)
+#     if action == 'Server History':  await cmd_loading.loading_queue(ctx, action, bot)
+#     elif action == 'Mine':  await cmd_loading.loading_queue(ctx, action, bot)
+#     else:  await ctx.send(embed = embedVar)
 
-@bot.hybrid_command(with_app_command=True, name = 'save', description=dp.save)
-async def saving(ctx, *, url: str): await cmd_loading.save_url_to_file(ctx, url, bot)
+# @bot.hybrid_command(with_app_command=True, name = 'save', description=dp.save)
+# async def saving(ctx, *, url: str): await cmd_loading.save_url_to_file(ctx, url, bot)
 
-@bot.event
-async def on_voice_state_update(member, before, after): await cmd_join.on_voice_state_update(member, before, after, bot)
+# @bot.event
+# async def on_voice_state_update(member, before, after): await cmd_join.on_voice_state_update(member, before, after, bot)
 
 # 播放音乐之外的功能
 @bot.hybrid_command(with_app_command=True, name = 'test', description='testing')

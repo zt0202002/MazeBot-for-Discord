@@ -1,4 +1,5 @@
 from discord import FFmpegPCMAudio
+from help_functions.help_text import FFMPEG_OPTIONS
 from help_functions.help_info import create_info
 from datetime import datetime
 
@@ -24,8 +25,8 @@ class Player():
             return None
         
         info = self.set_curr(gid, self.list[gid].pop(0), "[正在播放]", start=datetime.now(), pause=None)
-        # source = FFmpegPCMAudio(info['webpage_url'], **FFMPEG_OPTIONS) # ubuntu
-        source = FFmpegPCMAudio("testaudio.m4a") # ???
+        source = FFmpegPCMAudio(info['webpage_url'], **FFMPEG_OPTIONS)
+        # source = FFmpegPCMAudio("testaudio.m4a")
         voice.play(source, after=lambda e: self.play(ctx))
     
 
