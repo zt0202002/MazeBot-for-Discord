@@ -1,6 +1,6 @@
 from help_functions.help_text import *
 from help_functions.help_time import *
-from commands.music.cmd_skip import skip
+from commands.music.cmd_modify import skip
 from commands.music.cmd_resume import pause, resume
 from commands.music.music_playlist import player
 
@@ -14,6 +14,7 @@ async def current(ctx, msg=None, gpt=False):
         title = f'当前播放:\n{curr_info["title"]}\n{time_display(curr_info)} {curr_info["status"]}'
         desc = f'{curr_info["webpage_url"]}'
         embed_var = discord.Embed(title=title, description=desc, color=SUCCESS)
+        embed_var.set_image(url=curr_info['thumbnail'])
     
     if msg is None:       msg = await ctx.send(embed=embed_var, view=CurrentButton())
     if gpt and msg is not None: await msg.edit(content = '', embed=embed_var, view=CurrentButton())

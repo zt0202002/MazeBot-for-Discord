@@ -9,7 +9,7 @@ from typing import Literal
 from help_functions.help_text import *
 from help_functions.help_time import *
 
-from commands.music import cmd_join, cmd_play, cmd_current, cmd_resume, cmd_skip, cmd_queue #, cmd_delete, cmd_random, cmd_loading
+from commands.music import cmd_join, cmd_modify, cmd_play, cmd_current, cmd_resume, cmd_queue, cmd_random #, cmd_loading
 from commands import messages, test_slash, cmd_report, cmd_chatgpt, cmd_minecraft, cmd_googlesearch, cmd_splatoon
 
 load_dotenv()
@@ -49,8 +49,14 @@ async def join(ctx: commands.Context):  await cmd_join.join(ctx, bot)
 @bot.hybrid_command(with_app_command=True, name = 'leave', description=dp.leave)
 async def leave(ctx: commands.Context): await cmd_join.leave(ctx, bot)
 
+@bot.hybrid_command(with_app_command=True, name = 'quit', description=dp.leave)
+async def leave(ctx: commands.Context): await cmd_join.leave(ctx, bot)
+
 @bot.hybrid_command(with_app_command=True, name = 'play', description=dp.play)
-async def play(ctx: commands.Context, text_or_url: str): await cmd_play.play(ctx, bot, text_or_url)
+async def play(ctx: commands.Context, search_or_url: str=None): await cmd_play.play(ctx, bot, search_or_url)
+
+@bot.hybrid_command(with_app_command=True, name = 'add', description=dp.play)
+async def play(ctx: commands.Context, search_or_url: str): await cmd_play.play(ctx, bot, search_or_url)
 
 @bot.hybrid_command(with_app_command=True, name = 'nowplaying', description=dp.current)
 async def current(ctx: commands.Context): await cmd_current.current(ctx)
@@ -58,10 +64,10 @@ async def current(ctx: commands.Context): await cmd_current.current(ctx)
 @bot.hybrid_command(with_app_command=True, name = 'current', description=dp.current)
 async def current(ctx: commands.Context): await cmd_current.current(ctx)
 
-@bot.hybrid_command(with_app_command=True, name = 'curr', description=dp.current)
-async def current(ctx: commands.Context): await cmd_current.current(ctx)
-
 @bot.hybrid_command(with_app_command=True, name = 'resume', description=dp.resume)
+async def resume(ctx: commands.Context): await cmd_resume.resume(ctx, bot)
+
+@bot.hybrid_command(with_app_command=True, name = 'unpause', description=dp.resume)
 async def resume(ctx: commands.Context): await cmd_resume.resume(ctx, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'pause', description=dp.pause)
@@ -71,13 +77,16 @@ async def pause(ctx: commands.Context): await cmd_resume.pause(ctx, bot)
 async def pause(ctx: commands.Context): await cmd_resume.pause(ctx, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'skipall', description=dp.skipall)
-async def skipall(ctx: commands.Context): await cmd_skip.skipall(ctx, bot)
+async def skipall(ctx: commands.Context): await cmd_modify.skipall(ctx, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'skipto', description=dp.skipto)
-async def skipto(ctx: commands.Context, index: str): await cmd_skip.skipto(ctx, index, bot)
+async def skipto(ctx: commands.Context, index: str): await cmd_modify.skipto(ctx, index, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'skip', description=dp.skip)
-async def skip(ctx: commands.Context):  await cmd_skip.skip(ctx, bot)
+async def skip(ctx: commands.Context, index: int=None):  await cmd_modify.skip(ctx, bot, index)
+
+@bot.hybrid_command(with_app_command=True, name = 'top', description=dp.top)
+async def top(ctx: commands.Context, index: int):  await cmd_modify.top(ctx, index)
 
 @bot.hybrid_command(with_app_command=True, name = 'queue', description=dp.queue)
 async def queue(ctx: commands.Context): await cmd_queue.queue(ctx)
@@ -89,15 +98,15 @@ async def queue(ctx: commands.Context): await cmd_queue.queue(ctx)
 async def queue(ctx: commands.Context): await cmd_queue.queue(ctx)
 
 @bot.hybrid_command(with_app_command=True, name = 'search', description=dp.queue)
-async def queue(ctx: commands.Context, keywords: str): await cmd_play.search(ctx, bot, keywords)
+async def search(ctx: commands.Context, keywords: str): await cmd_play.search(ctx, bot, keywords)
+
+@bot.hybrid_command(with_app_command=True, name = 'delete', description=dp.delete)
+async def delete(ctx: commands.Context, index: int): await cmd_modify.skipat(ctx, index)
+
+@bot.hybrid_command(with_app_command=True, name = 'random', description=dp.random)
+async def random(ctx):  await cmd_random.randomQueue(ctx)
 
 # # 还没改完的音乐部分
-# @bot.hybrid_command(with_app_command=True, name = 'delete', description=dp.delete)
-# async def delete(ctx: commands.Context, index: int): await cmd_delete.delete(ctx, index, bot)
-
-# @bot.hybrid_command(with_app_command=True, name = 'random', description=dp.random)
-# async def random(ctx):  await cmd_random.randomQueue(ctx, bot)
-
 # @bot.hybrid_command(with_app_command=True, name = 'load', description=dp.loading)
 # async def loading(ctx, *, action: Literal['Server History', 'Mine']):
 #     embedVar = discord.Embed(title="现在就两个功能捏...", description="Please wait...", color=0x00ff00)
@@ -111,7 +120,7 @@ async def queue(ctx: commands.Context, keywords: str): await cmd_play.search(ctx
 # @bot.event
 # async def on_voice_state_update(member, before, after): await cmd_join.on_voice_state_update(member, before, after, bot)
 
-# 播放音乐之外的功能
+# # 播放音乐之外的功能
 @bot.hybrid_command(with_app_command=True, name = 'test', description='testing')
 # @commands.has_permissions(administrator=True)
 async def test(ctx: commands.Context): await test_slash.slash2(ctx)

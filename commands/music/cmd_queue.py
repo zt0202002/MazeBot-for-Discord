@@ -2,7 +2,7 @@ from help_functions.help_text import *
 from help_functions.help_time import *
 from commands.music.music_playlist import player
 from commands.music.cmd_resume import resume, pause
-from commands.music.cmd_skip import skip
+from commands.music.cmd_modify import skip
 
 PAGE_SIZE = 5
 
@@ -28,9 +28,13 @@ def convert_queue_to_embed(playlist, curr_info, start, pagesize=PAGE_SIZE):
         info_row = f'**当前歌曲:\n{curr_info["title"]}\n{time_display(curr_info)} {curr_info["status"]}\n **'
         embed_var.add_field(name=info_row, value=f'', inline=False)
     for i in range(pagesize):
-        info_row = f'[{start+i+1}]  {playlist[start+i]["title"][:35]}'
+        info_row = f'[{start+i+1}]  {playlist[start+i]["title"][:40]}'
         embed_var.add_field(name=info_row, value=f'', inline=False)
     
+    embed_var.add_field(name='\n|', value=f'', inline=False)
+    embed_var.add_field(name='\n|', value=f'', inline=False)
+    help_text = '“/top 标号”置顶歌曲\n“/delete 标号” 删除歌曲\n“/skipto 标号” 跳过到歌曲'
+    embed_var.add_field(name=help_text, value=f'', inline=False)
     return embed_var
 
 

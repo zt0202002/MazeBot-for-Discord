@@ -2,10 +2,13 @@ from discord import FFmpegPCMAudio
 from help_functions.help_text import FFMPEG_OPTIONS
 from help_functions.help_info import create_info
 from datetime import datetime
+import random, copy
+# @property函数不能有argument
+# 为了不暴露list，深拷贝一份发出去
 
 
 
-class Player():
+class Player:
     def __init__(self):
         self.list = {}
         self.curr = {}
@@ -33,13 +36,13 @@ class Player():
 
     def get_curr(self, gid):
         if gid in self.curr:
-            return self.curr[gid]
+            return copy.deepcopy(self.curr[gid])
         return {}
 
     def set_curr(self, gid, info, status, start, pause):
         info["start"] = start
         info["pause"] = pause
-        info["status"] = status #[正在播放] 或[已暂停]
+        info["status"] = status #[正在播放] 或 [已暂停]
         self.curr[gid] = info
         return info
 
@@ -47,7 +50,7 @@ class Player():
 
     def get_list(self, gid):
         if gid in self.list:
-            return self.list[gid]
+            return copy.deepcopy(self.list[gid])
         return []
 
     async def add_list(self, gid, url):
@@ -59,18 +62,31 @@ class Player():
         else:
             self.list[gid] += new_info
             return len(new_info)
+        
+    def move_top_list(self, gid, index):
+        if gid not in self.list or index <= 0 or index-1>len(self.list[gid]): return None
+        self.list[gid].insert(0, self.list[gid].pop(index-1))
+        return self.list[gid][0]
     
-    def remove_list(self, gid, num_of_remove):
-        if gid not in self.list: return
-        if num_of_remove <= 0:   return
-
+    def skip_to_list(self, gid, num_of_remove):
+        if gid not in self.list or num_of_remove <= 0: return False
         if num_of_remove >= len(self.list[gid]) + 1:
             self.clear(gid)
+            return False
         else:
             self.curr[gid] = {}
             self.list[gid] = self.list[gid][num_of_remove:]
+            return True
             # list = [1,2,3,4,5]
             # list[2:] -> [3,4,5]
+    
+    def delete_elem(self, gid, index):
+        try:    return self.list[gid].pop(index-1)
+        except: return None
+    
+    def shuffle_list(self, gid):
+        random.shuffle(self.list[gid])
+        return len(self.list[gid]) > 1
         
         
 

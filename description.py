@@ -1,3 +1,4 @@
+top = "This command pushes the song to the first position of waiting playlist"
 join = "This command makes the bot join the voice channel"
 play = "This command plays the song you requested"
 pause = "This command pauses the song"

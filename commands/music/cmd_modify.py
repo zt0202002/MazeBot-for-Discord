@@ -31,11 +31,14 @@ async def skipto(ctx, index, bot, needs_msg=True):
         embed_var = str_invalid_number  
     else: # 0 < num_of_skip < 待播放 + 正在播放
         if voice.is_playing(): voice.stop()
-        player.remove_list(gid, index-1)
-        player.play(ctx)
-        curr_info = player.get_curr(gid)
-        desc = f'{curr_info["title"]}\n{curr_info["webpage_url"]}'
-        embed_var = discord.Embed(title=f'我来播放这首歌了捏', description=desc, color=SUCCESS)
+        skipped = player.skip_to_list(gid, index-1)
+        if skipped:
+            player.play(ctx)
+            curr_info = player.get_curr(gid)
+            desc = f'{curr_info["title"]}\n{curr_info["webpage_url"]}'
+            embed_var = discord.Embed(title=f'我来播放这首歌了捏', description=desc, color=SUCCESS)
+        else:
+            embed_var = str_no_song_playing
         
     if needs_msg: await msg.edit(content='', embed=embed_var)
 
@@ -43,8 +46,31 @@ async def skipto(ctx, index, bot, needs_msg=True):
 
 
 # 跳过正在播放的歌曲
-async def skip(ctx, bot, msg=None):
-    await skipto(ctx, 1, bot, needs_msg = msg==None)
+async def skip(ctx, bot, index=None, msg=None):
+    if index is None:
+        await skipto(ctx, 1, bot, needs_msg = msg==None)
+    else:
+        await skipat(ctx, index)
+
+
+
+async def skipat(ctx, index):
+    deleted_elem = player.delete_elem(ctx.guild.id, index)
+    if deleted_elem is None:
+        embed_var = str_no_search_result
+    else:
+        embed_var = discord.Embed(title=f'我把第{index}首歌删掉了捏！', description=f'{deleted_elem["title"]}', color=SUCCESS)
+    await ctx.send(embed=embed_var)
+
+
+
+async def top(ctx, index):
+    top_elem = player.move_top_list(ctx.guild.id, index)
+    if top_elem is None:
+        embed_var = str_no_search_result
+    else:
+        embed_var = discord.Embed(title=f'我把第{index}首歌置顶了捏！', description=f'{top_elem["title"]}', color=SUCCESS)
+    await ctx.send(embed=embed_var)
 
 
 

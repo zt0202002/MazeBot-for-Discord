@@ -3,8 +3,6 @@ from help_functions.help_text import *
 from help_functions.help_time import *
 from commands.music.cmd_join import join
 from commands.music.music_playlist import player
-from commands.music.cmd_resume import resume
-# from commands.music.cmd_search import search
 from pytube import Search
 from bilibili_api import search as bilibili_search
 from commands.music.cmd_queue import PAGE_SIZE
@@ -14,8 +12,6 @@ import validators
 
 
 async def play(ctx, bot, input, msg=None):
-    if input is None: await resume(ctx, bot); return
-
     voice = get(bot.voice_clients, guild=ctx.guild)
     try:    channel = ctx.author.voice.channel
     except: channel = ctx.message.channel

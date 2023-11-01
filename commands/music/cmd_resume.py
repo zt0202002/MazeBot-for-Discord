@@ -22,7 +22,7 @@ async def resume(ctx, bot, msg=None):
         
         embedVar = discord.Embed(title=f'歌曲又开始播放啦！', description=f'', color=SUCCESS)
         if msg is None: await ctx.send(embed=embedVar)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
     else:
         embedVar = discord.Embed(title=f'歌曲已经在播放啦！', description=f'', color=FAILURE)
         if msg is None: await ctx.send(embed=embedVar)
@@ -43,7 +43,7 @@ async def pause(ctx, bot, msg=None, button=False):
         player.set_curr(gid, curr_info, '[已暂停]', start=curr_info['start'], pause=datetime.now())
         embedVar = discord.Embed(title=f'歌曲被暂停啦！', description=f'', color=SUCCESS)
         if msg is None: await ctx.send(embed=embedVar)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
     else:
         embedVar = discord.Embed(title=f'歌曲已经被暂停啦！', description=f'', color=FAILURE)
         if msg is None: await ctx.send(embed=embedVar)

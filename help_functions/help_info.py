@@ -79,50 +79,65 @@ async def bilibili_video_info(bv: str) -> List[Dict[str, Union[str, int]]]:
         info = await v.get_info()
         if info["videos"] == 1: # 单集(单p)
             return [{
-                'webpage_url': f'https://www.bilibili.com/video/{bv}',
-                'title': f'{info["title"]}',
-                'id': bv,
-                'extractor': 'BiliBili',
-                'duration': info["duration"],
-                'uploader':  info["owner"]["name"],
+                'webpage_url':  f'https://www.bilibili.com/video/{bv}',
+                'title':        f'{info["title"]}',
+                'id':           bv,
+                'extractor':    'BiliBili',
+                'duration':     info["duration"],
+                'uploader':     info["owner"]["name"],
+                'thumbnail':    info["pic"],
             }]
         else: # 合集(多p)
             return list(map(lambda page: {
-                'webpage_url': f'https://www.bilibili.com/video/{bv}?p={page["page"]}',
-                'title': f'<{info["title"]}>  {page["part"]}',
-                'id': f'{bv}?p={page["page"]}',
-                'extractor': 'BiliBili',
-                'duration': page["duration"],
-                'uploader':  info["owner"]["name"],
+                'webpage_url':  f'https://www.bilibili.com/video/{bv}?p={page["page"]}',
+                'title':        f'<{info["title"][:20]}>  {page["part"]}',
+                'id':           f'{bv}?p={page["page"]}',
+                'extractor':    'BiliBili',
+                'duration':     page["duration"],
+                'uploader':     info["owner"]["name"],
+                'thumbnail':    info["pic"],
             }, info["pages"]))
-    except:
-        return None
+    except: return None
 
 
 
 
 
 def youtube_info(url: str) -> List[Dict[str, Union[str, int]]]:
-    return others_info(url)
-    # # 合集
-    # try:
-    #     playlist = Playlist(url)
-    #     assert len(playlist.videos) > 0
-    #     info_list = []
-    #     for video in playlist.videos:
-    #         print(video.title)
-    #         info = video # needs conversion ???
-    #         info_list.append(info)
-    #     return info_list
-    # # 单个视频
-    # except Exception as e:
-        
-    #     try:
-    #         video = YouTube(url)
-    #         info = video # needs conversion ???
-    #         return info
-    #     except:
-    #         return False
+    # 合集
+    try:
+        playlist = Playlist(url)
+        assert len(playlist.videos) > 0
+        info_list = []
+        for info in playlist.videos:
+            try:
+                info.check_availability() # raise exception
+                info_list.append({
+                    'webpage_url':  info.watch_url,
+                    'title':        info.title,
+                    'id':           info.video_id,
+                    'extractor':    'youtube',
+                    'duration':     info.length,
+                    'uploader':     info.author,
+                    'thumbnail':    info.thumbnail_url,
+                })
+            except: pass
+        return info_list
+    # 单个视频
+    except Exception as e:
+        try:
+            info = YouTube(url)
+            info.check_availability() # raise exception
+            return [{
+                'webpage_url':  info.watch_url,
+                'title':        info.title,
+                'id':           info.video_id,
+                'extractor':    'youtube',
+                'duration':     info.length,
+                'uploader':     info.author,
+                'thumbnail':    info.thumbnail_url,
+            }]
+        except: return False
 
 
 
@@ -130,11 +145,26 @@ def others_info(url: str) -> List[Dict[str, Union[str, int]]]:
     try:
         with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
         if 'entries' in info:
-            return info['entries']
+            return list(map(lambda page: {
+                'webpage_url':  page['webpage_url'],
+                'title':        page["title"],
+                'id':           page['id'],
+                'extractor':    page['extractor'],
+                'duration':     page["duration"],
+                'uploader':     page['uploader'],
+                'thumbnail':    page['thumbnail'],
+            }, info['entries']))
         else:
-            return [info]
-    except:
-        return None
+            return [{
+                'webpage_url':  info['webpage_url'],
+                'title':        info["title"],
+                'id':           info['id'],
+                'extractor':    info['extractor'],
+                'duration':     info["duration"],
+                'uploader':     info['uploader'],
+                'thumbnail':    info['thumbnail'],
+            }]
+    except: return None
 
 
 
@@ -142,10 +172,11 @@ def others_info(url: str) -> List[Dict[str, Union[str, int]]]:
 
 # YoutubeDL key备注
 {
-    "webpage_url": "链接",
-    "title": "文件标题",
-    "id": "BV号, 必要时可以去重",
-    "extractor": "文件来源(YouTube, BiliBili, NetEase, etc.)",
-    "duration": "以秒计的时长(int)",
-    "uploader":  "上传者",
+    "webpage_url":  "链接",
+    "title":        "文件标题",
+    "id":           "BV号, 必要时可以去重",
+    "extractor":    "文件来源(YouTube, BiliBili, NetEase, etc.)",
+    "duration":     "以秒计的时长(int)",
+    "uploader":     "上传者",
+    "thumbnail":    "封面"
 }
