@@ -111,7 +111,7 @@ def youtube_info(url: str) -> List[Dict[str, Union[str, int]]]:
         info_list = []
         for info in playlist.videos:
             try:
-                info.check_availability() # raise exception
+                #info.check_availability() # raise exception
                 info_list.append({
                     'webpage_url':  info.watch_url,
                     'title':        info.title,
@@ -121,13 +121,13 @@ def youtube_info(url: str) -> List[Dict[str, Union[str, int]]]:
                     'uploader':     info.author,
                     'thumbnail':    info.thumbnail_url,
                 })
-            except: pass
+            except e: print(e)
         return info_list
     # 单个视频
     except Exception as e:
         try:
             info = YouTube(url)
-            info.check_availability() # raise exception
+            #info.check_availability() # raise exception
             return [{
                 'webpage_url':  info.watch_url,
                 'title':        info.title,
@@ -137,7 +137,7 @@ def youtube_info(url: str) -> List[Dict[str, Union[str, int]]]:
                 'uploader':     info.author,
                 'thumbnail':    info.thumbnail_url,
             }]
-        except: return False
+        except: return None
 
 
 
@@ -147,20 +147,20 @@ def others_info(url: str) -> List[Dict[str, Union[str, int]]]:
         if 'entries' in info:
             return list(map(lambda page: {
                 'webpage_url':  page['webpage_url'],
-                'title':        page["title"],
+                'title':        page['title'],
                 'id':           page['id'],
                 'extractor':    page['extractor'],
-                'duration':     page["duration"],
+                'duration':     page['duration'],
                 'uploader':     page['uploader'],
                 'thumbnail':    page['thumbnail'],
             }, info['entries']))
         else:
             return [{
                 'webpage_url':  info['webpage_url'],
-                'title':        info["title"],
+                'title':        info['title'],
                 'id':           info['id'],
                 'extractor':    info['extractor'],
-                'duration':     info["duration"],
+                'duration':     info['duration'],
                 'uploader':     info['uploader'],
                 'thumbnail':    info['thumbnail'],
             }]

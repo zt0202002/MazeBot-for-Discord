@@ -4,7 +4,7 @@ YDL_OPTIONS = {
         'format': 'bestaudio/best',
         'extractaudio': True,
         'audioformat': 'mp3',
-        'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+        'outtmpl': '%(extractor)s-%(id)s.m4a',
         'restrictfilenames': True,
         'noplaylist': True,
         'nocheckcertificate': True,
@@ -22,6 +22,7 @@ LOADING = 0x8B4C39
 SUCCESS = 0x487B60
 FAILURE = 0xD0B8A0
 
+str_loading_bot  = discord.Embed(title=f'上线中ing...', description='', color=LOADING)
 str_loading_song = discord.Embed(title=f'加载歌曲ing...', description='', color=LOADING)
 str_skiping_song = discord.Embed(title=f'跳过歌曲ing...', description='', color=LOADING)
 
