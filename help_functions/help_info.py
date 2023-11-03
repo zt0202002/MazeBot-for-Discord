@@ -13,6 +13,19 @@ from urllib.parse import urlparse, parse_qs
 
 
 
+# YoutubeDL key备注
+{
+    "webpage_url":  "链接",
+    "title":        "文件标题",
+    "id":           "BV号, 必要时可以去重",
+    "extractor":    "文件来源(YouTube, BiliBili, NetEase, etc.)",
+    "duration":     "以秒计的时长(int)",
+    "uploader":     "上传者",
+    "thumbnail":    "封面",
+    "download":     "未下载/正在下载/已下载",
+}
+
+
 
 async def create_info(url: str) -> List[Dict[str, Union[str, int]]]:
     # b站短链
@@ -61,10 +74,11 @@ async def bilibili_info(url: str) -> List[Dict[str, Union[str, int]]]:
             bv_list = map(lambda video: video["bvid"], playlist['archives'])
             info_list = await asyncio.gather(*map(bilibili_video_info, bv_list))
             
-            # python拍平list的黑魔法（二维变一维
-            info_list = [info for sublist in info_list for info in sublist]
             # python给list去None的黑魔法
-            return [i for i in info_list if i is not None]
+            info_list = [i for i in info_list if i is not None]
+            # python拍平list的黑魔法（二维变一维
+            return [info for sublist in info_list for info in sublist]
+            
         
         # 无关的个人空间链接
         except: return None
@@ -86,6 +100,7 @@ async def bilibili_video_info(bv: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     info["duration"],
                 'uploader':     info["owner"]["name"],
                 'thumbnail':    info["pic"],
+                'download':     '未下载',
             }]
         else: # 合集(多p)
             return list(map(lambda page: {
@@ -96,6 +111,7 @@ async def bilibili_video_info(bv: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     page["duration"],
                 'uploader':     info["owner"]["name"],
                 'thumbnail':    info["pic"],
+                'download':     '未下载',
             }, info["pages"]))
     except: return None
 
@@ -120,6 +136,7 @@ def youtube_info(url: str) -> List[Dict[str, Union[str, int]]]:
                     'duration':     info.length,
                     'uploader':     info.author,
                     'thumbnail':    info.thumbnail_url,
+                    'download':     '未下载',
                 })
             except e: print(e)
         return info_list
@@ -136,6 +153,7 @@ def youtube_info(url: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     info.length,
                 'uploader':     info.author,
                 'thumbnail':    info.thumbnail_url,
+                'download':     '未下载',
             }]
         except: return None
 
@@ -153,6 +171,7 @@ def others_info(url: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     page['duration'],
                 'uploader':     page['uploader'],
                 'thumbnail':    page['thumbnail'],
+                'download':     '未下载',
             }, info['entries']))
         else:
             return [{
@@ -163,20 +182,6 @@ def others_info(url: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     info['duration'],
                 'uploader':     info['uploader'],
                 'thumbnail':    info['thumbnail'],
+                'download':     '未下载',
             }]
     except: return None
-
-
-
-
-
-# YoutubeDL key备注
-{
-    "webpage_url":  "链接",
-    "title":        "文件标题",
-    "id":           "BV号, 必要时可以去重",
-    "extractor":    "文件来源(YouTube, BiliBili, NetEase, etc.)",
-    "duration":     "以秒计的时长(int)",
-    "uploader":     "上传者",
-    "thumbnail":    "封面"
-}
