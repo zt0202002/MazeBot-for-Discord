@@ -39,9 +39,6 @@ class Bot(commands.Bot):
 
 bot = Bot()
 
-@bot.event
-async def on_message(message):  await messages.on_message(message, bot)
-
 # 音乐部分
 @bot.hybrid_command(with_app_command=True, name = 'join', description=dp.join)
 async def join(ctx: commands.Context):  await cmd_join.join(ctx, bot)
@@ -106,21 +103,10 @@ async def delete(ctx: commands.Context, index: int): await cmd_modify.skipat(ctx
 @bot.hybrid_command(with_app_command=True, name = 'random', description=dp.random)
 async def random(ctx):  await cmd_random.randomQueue(ctx)
 
-# # 还没改完的音乐部分
-# @bot.hybrid_command(with_app_command=True, name = 'load', description=dp.loading)
-# async def loading(ctx, *, action: Literal['Server History', 'Mine']):
-#     embedVar = discord.Embed(title="现在就两个功能捏...", description="Please wait...", color=0x00ff00)
-#     if action == 'Server History':  await cmd_loading.loading_queue(ctx, action, bot)
-#     elif action == 'Mine':  await cmd_loading.loading_queue(ctx, action, bot)
-#     else:  await ctx.send(embed = embedVar)
+# 播放音乐之外的功能
+@bot.event
+async def on_message(message):  await messages.on_message(message, bot)
 
-# @bot.hybrid_command(with_app_command=True, name = 'save', description=dp.save)
-# async def saving(ctx, *, url: str): await cmd_loading.save_url_to_file(ctx, url, bot)
-
-# @bot.event
-# async def on_voice_state_update(member, before, after): await cmd_join.on_voice_state_update(member, before, after, bot)
-
-# # 播放音乐之外的功能
 @bot.hybrid_command(with_app_command=True, name = 'test', description='testing')
 # @commands.has_permissions(administrator=True)
 async def test(ctx: commands.Context): await test_slash.slash2(ctx)
