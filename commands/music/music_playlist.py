@@ -2,7 +2,7 @@ from discord import FFmpegPCMAudio
 from help_functions.help_text import YDL_OPTIONS, 下载状态
 from help_functions.help_info import create_info
 from datetime import datetime
-import random, copy, yt_dlp, asyncio, os, pytz, time
+import random, copy, yt_dlp, asyncio, os, pytz
 # 下载状态文档详见help_text
 
 MAX_DOWNLOAD_WAITING_SECONDS = 30
@@ -157,13 +157,13 @@ def download_audio(info, gid):
     info['download'] = 下载状态.正在下载
 
     # try:
-    # print(f'start download: {info["title"]}')
-    # download_timer = datetime.now()
+    print(f'start download: {info["title"]}')#???
+    download_timer = datetime.now()#???
     path = os.path.join(TEMP_AUDIO_FOLDER_NAME, str(gid), info['filename'])
     YDL_OPTIONS_FILENAME = {**YDL_OPTIONS, 'outtmpl': path}
     with yt_dlp.YoutubeDL(YDL_OPTIONS_FILENAME) as ydl: 
         ydl.download(info['webpage_url'])
-    # print(f'time spent: {datetime.now()-download_timer} - {info["title"]}')
+    print(f'time spent: {datetime.now()-download_timer} - {info["title"]}')#???
     # except: return False
 
     # 异步下载结束，检查下载状态是否仍为 正在下载

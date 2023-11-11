@@ -74,6 +74,16 @@ async def top(ctx, index):
 
 
 
+async def randomQueue(ctx):
+    msg = await ctx.send(embed = str_loading_song)
+    if player.shuffle_list(ctx.guild.id): 
+        str_random_queue = discord.Embed(title='随机播放队列', description='队列已随机', color=SUCCESS)
+    else:
+        str_random_queue = discord.Embed(title='随机播放队列', description='队列太短啦，无法随机', color=FAILURE)
+    await msg.edit(embed=str_random_queue)
+
+
+
 # 正在播放：当前号
 # [1]      列表1号
 # [2]      列表2号

@@ -85,7 +85,7 @@ async def play_music(ctx, bot, msg, num_of_new):
     
 
 
-async def search(ctx, bot, keywords, msg=None, search='BiliBili'):
+async def search(ctx, bot, keywords, msg=None, search='youtube'):
     voice = get(bot.voice_clients, guild=ctx.guild)
     if msg is not None: channel = ctx.author.voice.channel
     else:               channel = ctx.message.author.voice.channel

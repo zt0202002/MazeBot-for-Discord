@@ -9,7 +9,7 @@ from typing import Literal
 from help_functions.help_text import *
 from help_functions.help_time import *
 
-from commands.music import cmd_join, cmd_modify, cmd_play, cmd_current, cmd_resume, cmd_queue, cmd_random #, cmd_loading
+from commands.music import cmd_join, cmd_modify, cmd_play, cmd_current, cmd_resume, cmd_queue
 from commands import messages, test_slash, cmd_report, cmd_chatgpt, cmd_minecraft, cmd_googlesearch, cmd_splatoon
 
 load_dotenv()
@@ -101,7 +101,7 @@ async def search(ctx: commands.Context, keywords: str): await cmd_play.search(ct
 async def delete(ctx: commands.Context, index: int): await cmd_modify.skipat(ctx, index)
 
 @bot.hybrid_command(with_app_command=True, name = 'random', description=dp.random)
-async def random(ctx):  await cmd_random.randomQueue(ctx)
+async def random(ctx):  await cmd_modify.randomQueue(ctx)
 
 # 播放音乐之外的功能
 @bot.event
