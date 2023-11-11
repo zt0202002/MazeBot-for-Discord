@@ -2,11 +2,14 @@
 *.json
 *.pyc
 __pycache__
+testjson
 *.mp3
 *.wav
+*.m4a
 test.py
 .empty
 /QueueLog/*/*.json
 QueueLog/ServerHistory/963220885706244106.json
-*.json
 *.pyc
+*.exe
+*.webm

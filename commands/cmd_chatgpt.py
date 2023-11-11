@@ -5,7 +5,7 @@ from revChatGPT.V3 import Chatbot
 
 from os.path import exists
 from dotenv import load_dotenv
-from commands import cmd_play, cmd_queue, cmd_join, cmd_current, cmd_resume, cmd_search, cmd_skip
+from commands.music import cmd_modify, cmd_play, cmd_queue, cmd_join, cmd_current, cmd_resume
 
 chatbot = {}
 CHAT_CHANNEL_ID = []
@@ -229,24 +229,24 @@ async def is_music_commands(ctx, bot, msg, response):
     # check valid commands
     if '\play' == response.split(' ')[0]:
         url = response.split(' ')[1]
-        await cmd_play.play(ctx, url, bot, msg)
+        await cmd_play.play(ctx, bot, url, msg=msg)
     elif '\join' == response:
-        await cmd_join.join(ctx, bot, msg)
+        await cmd_join.join(ctx, bot, msg=msg)
     elif '\queue' == response:
         await cmd_queue.queue(ctx, bot, msg)
     elif '\current' == response:
         await cmd_current.current(ctx, bot, msg, True)
     elif '\\resume' == response:
-        await cmd_resume.resume(ctx, bot, msg)
+        await cmd_resume.resume(ctx, bot, msg=msg)
     elif '\search' == response.split(' ')[0] and len(response.split(' ')) > 1:
         content = response.split(' ')[1]
-        await cmd_search.search(ctx, content, bot, msg)
+        await cmd_play.search(ctx, bot, content, msg=msg)
     elif '\pause' in response:
-        await cmd_resume.pause(ctx, bot, msg)
+        await cmd_resume.pause(ctx, bot, msg=msg)
     elif '\skip' in response:
-        await cmd_skip.skip(ctx, bot, msg)
+        await cmd_modify.skip(ctx, bot, msg=msg)
     elif '\leave' in response:
-        await cmd_join.leave(ctx, bot, msg)
+        await cmd_join.leave(ctx, bot, msg=msg)
     else:
         return False
 
