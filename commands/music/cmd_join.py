@@ -28,7 +28,7 @@ async def leave(ctx, bot, msg=None):
         await voice.disconnect()
         if msg is None: await ctx.send(embed=str_leave)
         else:           await msg.edit(content='', embed=str_leave)
-        player.clear(ctx.guild.id)
+        await player.clear(ctx.guild.id)
     else:
         if msg is None: await ctx.send(embed=str_not_in_voice)
         else:           await msg.edit(content='', embed=str_not_in_voice)

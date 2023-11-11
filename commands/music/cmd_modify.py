@@ -9,15 +9,12 @@ async def skipall(ctx, bot):
     voice = get(bot.voice_clients, guild=ctx.guild)
     gid = ctx.guild.id
 
-    if voice.is_playing(): voice.stop()
-    player.clear(gid)
+    voice.stop()
+    await player.clear(gid)
     await msg.edit(content = '', embed=str_no_song_next)
 
 # 跳过数首歌到指定的歌曲
 async def skipto(ctx, index, bot, needs_msg=True):
-    try:    index = int(index)
-    except: await ctx.send(embed=str_invalid_number)
-
     if needs_msg:
         msg = await ctx.send(embed=str_skiping_song)
     voice = get(bot.voice_clients, guild=ctx.guild)
@@ -25,15 +22,18 @@ async def skipto(ctx, index, bot, needs_msg=True):
     playlist = player.get_list(gid)
     curr_info = player.get_curr(gid)
     
-    if playlist == [] or curr_info == {}:
+    if curr_info == {}:
         embed_var = str_no_song_playing
+    elif playlist == []: # 最后一首
+        voice.stop()
+        embed_var = str_no_song_next
     elif index <= 0 or index > len(playlist) + 1:
-        embed_var = str_invalid_number  
-    else: # 0 < num_of_skip < 待播放 + 正在播放
-        if voice.is_playing(): voice.stop()
-        skipped = player.skip_to_list(gid, index-1)
+        embed_var = str_invalid_number
+    else: # 1 <= index <= 待播放总数
+        voice.stop()
+        skipped = await player.skip_to_list(gid, index-1)
         if skipped:
-            player.play(ctx)
+            await player.play(ctx, bot)
             curr_info = player.get_curr(gid)
             desc = f'{curr_info["title"]}\n{curr_info["webpage_url"]}'
             embed_var = discord.Embed(title=f'我来播放这首歌了捏', description=desc, color=SUCCESS)
@@ -55,7 +55,7 @@ async def skip(ctx, bot, index=None, msg=None):
 
 
 async def skipat(ctx, index):
-    deleted_elem = player.delete_elem(ctx.guild.id, index)
+    deleted_elem = await player.delete_list_elem(ctx.guild.id, index-1)
     if deleted_elem is None:
         embed_var = str_no_search_result
     else:
@@ -65,7 +65,7 @@ async def skipat(ctx, index):
 
 
 async def top(ctx, index):
-    top_elem = player.move_top_list(ctx.guild.id, index)
+    top_elem = player.move_top_list(ctx.guild.id, index-1)
     if top_elem is None:
         embed_var = str_no_search_result
     else:

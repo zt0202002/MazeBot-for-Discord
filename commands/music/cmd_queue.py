@@ -15,11 +15,11 @@ async def queue(ctx, msg=None):
 
 
 def convert_queue_to_embed(playlist, curr_info, start, pagesize=PAGE_SIZE):
-    if playlist == [] or start > len(playlist): 
+    start = max(start, 0)
+    if curr_info == {} and playlist == []: 
         return str_no_song_playing
-    
-    if start < 0:                       start = 0
-    if start+pagesize > len(playlist):  pagesize = len(playlist)-start
+    if start+pagesize > len(playlist):  
+        pagesize = len(playlist)-start
 
     total_time = total_time_display(sum(map(lambda info: info["duration"], playlist)), curr_info)
     embed_var = discord.Embed(title=f'播放列表 共{len(playlist)+1}首 {total_time}\n', description="", color=SUCCESS)
@@ -29,11 +29,12 @@ def convert_queue_to_embed(playlist, curr_info, start, pagesize=PAGE_SIZE):
         embed_var.add_field(name=info_row, value=f'', inline=False)
     for i in range(pagesize):
         info_row = f'[{start+i+1}]  {playlist[start+i]["title"][:40]}'
+        # info_row = f'[{start+i+1}] {playlist[start+i]["download"].name} {playlist[start+i]["title"][:40]}'
         embed_var.add_field(name=info_row, value=f'', inline=False)
     
     embed_var.add_field(name='\n|', value=f'', inline=False)
     embed_var.add_field(name='\n|', value=f'', inline=False)
-    help_text = '“/top 标号”置顶歌曲\n“/delete 标号” 删除歌曲\n“/skipto 标号” 跳过到歌曲'
+    help_text = '置顶歌曲 /top 标号\n删除歌曲 /delete 标号\n跳至歌曲 /skipto 标号'
     embed_var.add_field(name=help_text, value=f'', inline=False)
     return embed_var
 

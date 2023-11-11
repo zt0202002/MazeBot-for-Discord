@@ -28,8 +28,7 @@ async def resume(ctx, bot, msg=None):
         if msg is None: await ctx.send(embed=embedVar)
         else: await msg.edit(content='', embed=embedVar)
 
-async def pause(ctx, bot, msg=None, button=False):
-    global pause_time
+async def pause(ctx, bot, msg=None):
     voice = get(bot.voice_clients, guild=ctx.guild)
     gid = ctx.guild.id
     curr_info = player.get_curr(gid)

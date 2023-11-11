@@ -229,24 +229,24 @@ async def is_music_commands(ctx, bot, msg, response):
     # check valid commands
     if '\play' == response.split(' ')[0]:
         url = response.split(' ')[1]
-        await cmd_play.play(ctx, bot, url, msg)
+        await cmd_play.play(ctx, bot, url, msg=msg)
     elif '\join' == response:
-        await cmd_join.join(ctx, bot, msg)
+        await cmd_join.join(ctx, bot, msg=msg)
     elif '\queue' == response:
         await cmd_queue.queue(ctx, bot, msg)
     elif '\current' == response:
         await cmd_current.current(ctx, bot, msg, True)
     elif '\\resume' == response:
-        await cmd_resume.resume(ctx, bot, msg)
+        await cmd_resume.resume(ctx, bot, msg=msg)
     elif '\search' == response.split(' ')[0] and len(response.split(' ')) > 1:
         content = response.split(' ')[1]
-        await cmd_play.search(ctx, bot, content, msg)
+        await cmd_play.search(ctx, bot, content, msg=msg)
     elif '\pause' in response:
-        await cmd_resume.pause(ctx, bot, msg)
+        await cmd_resume.pause(ctx, bot, msg=msg)
     elif '\skip' in response:
-        await cmd_modify.skip(ctx, bot, msg)
+        await cmd_modify.skip(ctx, bot, msg=msg)
     elif '\leave' in response:
-        await cmd_join.leave(ctx, bot, msg)
+        await cmd_join.leave(ctx, bot, msg=msg)
     else:
         return False
 

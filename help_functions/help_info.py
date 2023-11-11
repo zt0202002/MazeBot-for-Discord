@@ -1,8 +1,8 @@
 # 接受一个url，返回一个带有类youtubeDL格式的dict（见备注）
 
 from typing import List, Dict, Union
-import asyncio
-
+import asyncio, pytz
+from datetime import datetime
 from help_functions.help_text import *
 from yt_dlp import YoutubeDL
 from pytube import YouTube, Playlist
@@ -22,29 +22,34 @@ from urllib.parse import urlparse, parse_qs
     "duration":     "以秒计的时长(int)",
     "uploader":     "上传者",
     "thumbnail":    "封面",
-    "download":     "未下载/正在下载/已下载",
+    "download":     "未下载/正在下载/已下载/放弃下载",
+    "filename":     "gid-extractor-id.m4a"
 }
 
 
 
-async def create_info(url: str) -> List[Dict[str, Union[str, int]]]:
+async def create_info(url: str, time_str: str) -> List[Dict[str, Union[str, int, 下载状态]]]:
     # b站短链
     if 'b23.tv' in url:
         long_url = await get_real_url(url)
-        return await bilibili_info(long_url)
+        return await bilibili_info(long_url, time_str)
     # b站
     elif 'bilibili.com' in url:
-        return await bilibili_info(url)
+        return await bilibili_info(url, time_str)
     # YouTube
     elif 'youtube.com' in url or 'youtu.be' in url:
-        return youtube_info(url)
+        loop = asyncio.get_event_loop()
+        info_list = await loop.run_in_executor(None, youtube_info, url, time_str)
+        return info_list
     # 网易云，SoundCloud，Bandcamp，etc.
     else:
-        return others_info(url)
+        loop = asyncio.get_event_loop()
+        info_list = await loop.run_in_executor(None, others_info, url, time_str)
+        return info_list
 
 
 
-async def bilibili_info(url: str) -> List[Dict[str, Union[str, int]]]:
+async def bilibili_info(url: str, time_str: str) -> List[Dict[str, Union[str, int, 下载状态]]]:
     url_parsed = urlparse(url)
     path = url_parsed.path
 
@@ -52,7 +57,7 @@ async def bilibili_info(url: str) -> List[Dict[str, Union[str, int]]]:
     if 'video' in path:
         # /video/BVxxxxxxxxxx/ => ['','video','BVxxxxxxxxxx','']
         bv = path.split('/')[2]
-        return await bilibili_video_info(bv)
+        return await bilibili_video_info(bv, time_str)
     
     # 合集/列表
     elif 'space.bilibili.com' in url_parsed.netloc:
@@ -72,22 +77,19 @@ async def bilibili_info(url: str) -> List[Dict[str, Union[str, int]]]:
             pl = bilibili_list.ChannelSeries(uid=user_id, type_=list_type, id_=list_id)
             playlist = await pl.get_videos()
             bv_list = map(lambda video: video["bvid"], playlist['archives'])
-            info_list = await asyncio.gather(*map(bilibili_video_info, bv_list))
+            info_list = await asyncio.gather(*map(lambda bv: bilibili_video_info(bv, time_str), bv_list))
             
-            # python给list去None的黑魔法
-            info_list = [i for i in info_list if i is not None]
             # python拍平list的黑魔法（二维变一维
             return [info for sublist in info_list for info in sublist]
             
-        
         # 无关的个人空间链接
-        except: return None
+        except: return []
     # 其他b站链接
-    else: return None
+    else: return []
 
 # 读取bilibili-api的信息，转成类youtubeDL返回
 # 分开写主要是为了分隔title的写法
-async def bilibili_video_info(bv: str) -> List[Dict[str, Union[str, int]]]:
+async def bilibili_video_info(bv: str, time_str: str) -> List[Dict[str, Union[str, int, 下载状态]]]:
     try:
         v = bilibili_video.Video(bvid=bv)
         info = await v.get_info()
@@ -100,7 +102,8 @@ async def bilibili_video_info(bv: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     info["duration"],
                 'uploader':     info["owner"]["name"],
                 'thumbnail':    info["pic"],
-                'download':     '未下载',
+                'download':     下载状态.未下载,
+                'filename':     f'BiliBili-{bv}-{time_str}.m4a'
             }]
         else: # 合集(多p)
             return list(map(lambda page: {
@@ -111,15 +114,16 @@ async def bilibili_video_info(bv: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     page["duration"],
                 'uploader':     info["owner"]["name"],
                 'thumbnail':    info["pic"],
-                'download':     '未下载',
+                'download':     下载状态.未下载,
+                'filename':     f'BiliBili-{bv}-{page["page"]}p-{time_str}.m4a'
             }, info["pages"]))
-    except: return None
+    except: return []
 
 
 
 
 
-def youtube_info(url: str) -> List[Dict[str, Union[str, int]]]:
+def youtube_info(url: str, time_str: str) -> List[Dict[str, Union[str, int, 下载状态]]]:
     # 合集
     try:
         playlist = Playlist(url)
@@ -136,7 +140,8 @@ def youtube_info(url: str) -> List[Dict[str, Union[str, int]]]:
                     'duration':     info.length,
                     'uploader':     info.author,
                     'thumbnail':    info.thumbnail_url,
-                    'download':     '未下载',
+                    'download':     下载状态.未下载,
+                    'filename':     f'youtube-{info.video_id}-{time_str}.m4a'
                 })
             except e: print(e)
         return info_list
@@ -153,13 +158,14 @@ def youtube_info(url: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     info.length,
                 'uploader':     info.author,
                 'thumbnail':    info.thumbnail_url,
-                'download':     '未下载',
+                'download':     下载状态.未下载,
+                'filename':     f'youtube-{info.video_id}-{time_str}.m4a'
             }]
-        except: return None
+        except: return []
 
 
 
-def others_info(url: str) -> List[Dict[str, Union[str, int]]]:
+def others_info(url: str, time_str: str) -> List[Dict[str, Union[str, int, 下载状态]]]:
     try:
         with YoutubeDL(YDL_OPTIONS) as ydl: info = ydl.extract_info(url, download=False)
         if 'entries' in info:
@@ -171,7 +177,8 @@ def others_info(url: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     page['duration'],
                 'uploader':     page['uploader'],
                 'thumbnail':    page['thumbnail'],
-                'download':     '未下载',
+                'download':     下载状态.未下载,
+                'filename':     f'{page["extractor"]}-{page["id"]}-{time_str}.m4a'
             }, info['entries']))
         else:
             return [{
@@ -182,6 +189,7 @@ def others_info(url: str) -> List[Dict[str, Union[str, int]]]:
                 'duration':     info['duration'],
                 'uploader':     info['uploader'],
                 'thumbnail':    info['thumbnail'],
-                'download':     '未下载',
+                'download':     下载状态.未下载,
+                'filename':     f'{info["extractor"]}-{info["id"]}-{time_str}.m4a'
             }]
-    except: return None
+    except: return []

@@ -77,7 +77,7 @@ async def pause(ctx: commands.Context): await cmd_resume.pause(ctx, bot)
 async def skipall(ctx: commands.Context): await cmd_modify.skipall(ctx, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'skipto', description=dp.skipto)
-async def skipto(ctx: commands.Context, index: str): await cmd_modify.skipto(ctx, index, bot)
+async def skipto(ctx: commands.Context, index: int): await cmd_modify.skipto(ctx, index, bot)
 
 @bot.hybrid_command(with_app_command=True, name = 'skip', description=dp.skip)
 async def skip(ctx: commands.Context, index: int=None):  await cmd_modify.skip(ctx, bot, index)

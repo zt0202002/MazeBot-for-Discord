@@ -1,10 +1,31 @@
 import discord
+from enum import Enum
+
+class 下载状态(Enum):
+    # 起始情形，帮助player.download_audio()判断要不要下载
+    未下载 = 0
+    # 赋值：仅初始化(create_info())
+
+    # 过程情形，帮助player.play()判断curr要不要下载，帮助如remove_audio()判断有没有未出现的删除
+    正在下载 = 1
+    # 赋值：player.download_audio()开头
+
+    # 成功情形，已经有本地下载文件
+    已下载 = 2
+    # 赋值：player.download_audio()结尾
+
+    # 失败情形，帮助player.download_audio()判断是否还需要下载，下载途中歌曲是否已被移除歌单
+    放弃下载 = 3
+    # 赋值: player.clear_download()
+    #       player.skip_to_list()
+    #       player.play()正在下载超时
+    #       delete_list_elem()正在下载超时
 
 YDL_OPTIONS = {
         'format': 'bestaudio/best',
         'extractaudio': True,
         'audioformat': 'mp3',
-        'outtmpl': '%(extractor)s-%(id)s.m4a',
+        # 'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
         'restrictfilenames': True,
         'noplaylist': True,
         'nocheckcertificate': True,

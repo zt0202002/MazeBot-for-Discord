@@ -38,7 +38,7 @@ class CurrentButton(discord.ui.View):
     @discord.ui.button(label="跳过", row=0, style=discord.ButtonStyle.success)
     async def skip_button_callback(self, interaction, button):
         button.view.timeout = None
-        await skip(interaction, interaction.client, interaction.message)
+        await skip(interaction, interaction.client, msg=interaction.message)
         embed_var = await current(interaction, msg=interaction.message)
         await interaction.response.edit_message(content = '', embed=embed_var, view=self)
 

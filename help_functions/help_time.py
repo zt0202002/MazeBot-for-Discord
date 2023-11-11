@@ -8,10 +8,11 @@ def time_display(cur):
     t_played = now - start - pause
     return f'[{str(t_played).split(".")[0]}/{str(duration).split(".")[0]}]'
 
-def total_time_display(num, cur):
-    start = cur['start']
-    pause = timedelta(seconds=0) if cur['pause'] is None else datetime.now() - cur['pause']
+def total_time_display(num, curr):
+    start = curr['start']
+    pause = timedelta(seconds=0) if curr['pause'] is None else datetime.now() - curr['pause']
     duration = timedelta(seconds=num)
+    curr_duration = timedelta(seconds=curr['duration'])
     now = datetime.now()
-    total_time = duration - (now - start - pause)
+    total_time = duration + curr_duration - (now - start - pause)
     return f'[{str(total_time).split(".")[0]}]'
