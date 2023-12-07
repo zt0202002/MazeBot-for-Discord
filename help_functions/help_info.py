@@ -1,8 +1,7 @@
 # 接受一个url，返回一个带有类youtubeDL格式的dict（见备注）
 
 from typing import List, Dict, Union
-import asyncio, pytz
-from datetime import datetime
+import asyncio
 from help_functions.help_text import *
 from yt_dlp import YoutubeDL
 from pytube import YouTube, Playlist
@@ -25,6 +24,33 @@ from urllib.parse import urlparse, parse_qs
     "download":     "未下载/正在下载/已下载/放弃下载",
     "filename":     "gid-extractor-id.m4a"
 }
+
+
+
+async def validate_list(url: str) -> bool:
+    url_parsed = urlparse(url)
+    netloc = url_parsed.netloc
+    path = url_parsed.path
+    # b站短链
+    print(f'space.bilibili.com in netloc {"space.bilibili.com" in netloc}')
+    print(f'seriesdetail in path {"seriesdetail" in path}')
+    print(f"'collectiondetail' in path {'collectiondetail' in path}")
+    if 'b23.tv' in netloc:
+        long_url = await get_real_url(url)
+        return await validate_list(long_url)
+    # b站合集或列表
+    elif 'space.bilibili.com' in netloc and 'seriesdetail' in path or 'collectiondetail' in path:
+        return True
+    # YouTube
+    elif 'youtube.com' in url or 'youtu.be' in url:
+        try:
+            playlist = Playlist(url)
+            assert len(playlist.videos) > 0
+            return True
+        except:
+            return False
+    else:
+        return False
 
 
 
@@ -61,31 +87,32 @@ async def bilibili_info(url: str, time_str: str) -> List[Dict[str, Union[str, in
     
     # 合集/列表
     elif 'space.bilibili.com' in url_parsed.netloc:
-        try:
-            # '/00000000/channel/seriesdetail' => ['','00000000', 'channel', 'seriesdetail']
-            user_id = int(path.split('/')[1])
-            query = parse_qs(url_parsed.query)
-            list_id = int(query["sid"][0])
-            # 合集（高级收藏夹，看起来像分p）
-            if 'seriesdetail' in path:
-                list_type = bilibili_list.ChannelSeriesType.SERIES
-            # 列表（自定义收藏夹）
-            elif 'collectiondetail' in path:
-                list_type = bilibili_list.ChannelSeriesType.SEASON # 怀疑名字之后会改
-            else: return None
-            # 获取合集/列表，转为单链接视频的list
-            pl = bilibili_list.ChannelSeries(uid=user_id, type_=list_type, id_=list_id)
-            playlist = await pl.get_videos()
-            bv_list = map(lambda video: video["bvid"], playlist['archives'])
-            info_list = await asyncio.gather(*map(lambda bv: bilibili_video_info(bv, time_str), bv_list))
-            
-            # python拍平list的黑魔法（二维变一维
-            return [info for sublist in info_list for info in sublist]
-            
-        # 无关的个人空间链接
-        except: return []
+        # '/00000000/channel/seriesdetail' => ['','00000000', 'channel', 'seriesdetail']
+        user_id = int(path.split('/')[1])
+        query = parse_qs(url_parsed.query)
+        list_id = int(query["sid"][0])
+        # 合集（高级收藏夹，看起来像分p）
+        if 'seriesdetail' in path:
+            list_type = bilibili_list.ChannelSeriesType.SERIES
+        # 列表（自定义收藏夹）
+        elif 'collectiondetail' in path:
+            list_type = bilibili_list.ChannelSeriesType.SEASON # 怀疑名字之后会改
+        else: 
+            print('不支持其他空间链接')
+            return None
+        # 获取合集/列表，转为单链接视频的list
+        pl = bilibili_list.ChannelSeries(uid=user_id, type_=list_type, id_=list_id)
+        playlist = await pl.get_videos()
+        bv_list = map(lambda video: video["bvid"], playlist['archives'])
+        info_list = await asyncio.gather(*map(lambda bv: bilibili_video_info(bv, time_str), bv_list))
+        
+        # python拍平list的黑魔法（二维变一维
+        # print('到这儿还是对的')
+        return [info for sublist in info_list for info in sublist]
     # 其他b站链接
-    else: return []
+    else:
+        print('不支持其他b站链接') 
+        return []
 
 # 读取bilibili-api的信息，转成类youtubeDL返回
 # 分开写主要是为了分隔title的写法
@@ -117,7 +144,13 @@ async def bilibili_video_info(bv: str, time_str: str) -> List[Dict[str, Union[st
                 'download':     下载状态.未下载,
                 'filename':     f'BiliBili-{bv}-{page["page"]}p-{time_str}.m4a'
             }, info["pages"]))
-    except: return []
+    except Exception as e: 
+        print(e)
+        # 例如：https://www.bilibili.com/video/BV1Yv411a7Vk
+        # 接口返回错误代码：62002，信息：稿件不可见。
+        # {'code': 62002, 'message': '稿件不可见', 'ttl': 1}
+        # 这不是一个有效的链接捏！
+        return []
 
 
 
@@ -143,10 +176,11 @@ def youtube_info(url: str, time_str: str) -> List[Dict[str, Union[str, int, 下�
                     'download':     下载状态.未下载,
                     'filename':     f'youtube-{info.video_id}-{time_str}.m4a'
                 })
-            except e: print(e)
+            except Exception as e: 
+                print(e)
         return info_list
     # 单个视频
-    except Exception as e:
+    except:
         try:
             info = YouTube(url)
             #info.check_availability() # raise exception
@@ -161,7 +195,9 @@ def youtube_info(url: str, time_str: str) -> List[Dict[str, Union[str, int, 下�
                 'download':     下载状态.未下载,
                 'filename':     f'youtube-{info.video_id}-{time_str}.m4a'
             }]
-        except: return []
+        except Exception as e: 
+            print(e)
+            return []
 
 
 
@@ -192,4 +228,6 @@ def others_info(url: str, time_str: str) -> List[Dict[str, Union[str, int, 下�
                 'download':     下载状态.未下载,
                 'filename':     f'{info["extractor"]}-{info["id"]}-{time_str}.m4a'
             }]
-    except: return []
+    except Exception as e: 
+        print(e)
+        return []

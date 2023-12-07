@@ -8,8 +8,7 @@ testjson
 *.m4a
 test.py
 .empty
-/QueueLog/*/*.json
-QueueLog/ServerHistory/963220885706244106.json
+QueueLog
 *.pyc
 *.exe
 *.webm

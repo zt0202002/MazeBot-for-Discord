@@ -10,7 +10,7 @@ async def skipall(ctx, bot):
     gid = ctx.guild.id
 
     voice.stop()
-    await player.clear(gid)
+    await player.clear_playlist(gid)
     await msg.edit(content = '', embed=str_no_song_next)
 
 # 跳过数首歌到指定的歌曲

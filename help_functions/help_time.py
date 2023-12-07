@@ -1,5 +1,19 @@
 from datetime import datetime, timedelta
 
+# potentially help loading user/guild history playtime, may break being longer than 24 hours
+def time_str_to_delta(str): # str = '13:42:10'
+    dt = datetime.strptime(str, "%H:%M:%S")
+    total_sec = dt.hour*3600 + dt.minute*60 + dt.second  # total seconds calculation
+    td = timedelta(seconds=total_sec)
+    return td
+
+def time_played_int(cur):
+    start = cur['start']
+    pause = timedelta(seconds=0) if cur['pause'] is None else datetime.now() - cur['pause']
+    now = datetime.now()
+    t_played = now - start - pause
+    return str(t_played)
+
 def time_display(cur):
     start = cur['start']
     pause = timedelta(seconds=0) if cur['pause'] is None else datetime.now() - cur['pause']
