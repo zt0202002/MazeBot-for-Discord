@@ -32,8 +32,8 @@ def convert_queue_to_embed(playlist, curr_info, start, pagesize=PAGE_SIZE):
         # info_row = f'[{start+i+1}] {playlist[start+i]["download"].name} {playlist[start+i]["title"][:40]}'
         embed_var.add_field(name=info_row, value=f'', inline=False)
     
-    embed_var.add_field(name='\n|', value=f'', inline=False)
-    embed_var.add_field(name='\n|', value=f'', inline=False)
+    embed_var.add_field(name='\n\u200b', value=f'', inline=False)
+    embed_var.add_field(name='\n\u200b', value=f'', inline=False)
     help_text = '置顶歌曲 /top 标号\n删除歌曲 /delete 标号\n跳至歌曲 /skipto 标号'
     embed_var.add_field(name=help_text, value=f'', inline=False)
     return embed_var
@@ -98,9 +98,11 @@ class QueueButton(discord.ui.View):
         gid = interaction.guild.id
         playlist = player.get_list(gid)
 
-        remainder = len(playlist) % PAGE_SIZE
-        if self.index + PAGE_SIZE >= len(playlist): self.index = len(playlist) - remainder
-        else:                                       self.index+= PAGE_SIZE
+        remainder = (len(playlist)-1) % PAGE_SIZE + 1 # 当len能被整除时余一页
+        if self.index + PAGE_SIZE >= len(playlist): 
+            self.index = len(playlist) - remainder
+        else:
+            self.index+= PAGE_SIZE
 
         embed_var = convert_queue_to_embed(playlist, player.get_curr(gid), self.index)
         await interaction.response.edit_message(content = '', embed=embed_var, view=self)

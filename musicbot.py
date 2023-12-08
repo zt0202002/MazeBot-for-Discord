@@ -1,18 +1,19 @@
 import discord
-import os
+import os, shutil
 # load our local env so we dont have the token in public
 from dotenv import load_dotenv
 from discord.ext import commands
 import description as dp
 from typing import Literal
 
-from help_functions.help_text import *
-from help_functions.help_time import *
+from help_functions.help_text import TEMP_AUDIO_FOLDER_NAME
 
-from commands.music import cmd_join, cmd_modify, cmd_play, cmd_current, cmd_resume, cmd_queue
+from commands.music import cmd_join, cmd_modify, cmd_play, cmd_current, cmd_resume, cmd_queue, cmd_load
 from commands import messages, test_slash, cmd_report, cmd_chatgpt, cmd_minecraft, cmd_googlesearch, cmd_splatoon
 
 load_dotenv()
+if os.path.exists(TEMP_AUDIO_FOLDER_NAME):
+    shutil.rmtree(TEMP_AUDIO_FOLDER_NAME)
 intents = discord.Intents.all()
 
 ######### Slash Commands #########
@@ -102,6 +103,18 @@ async def delete(ctx: commands.Context, index: int): await cmd_modify.skipat(ctx
 
 @bot.hybrid_command(with_app_command=True, name = 'random', description=dp.random)
 async def random(ctx):  await cmd_modify.randomQueue(ctx)
+
+@bot.hybrid_command(with_app_command=True, name = 'load', description=dp.load)
+async def load(ctx, *, action: Literal['ServerHistory', 'Mine']):
+    if action == 'ServerHistory':
+        await cmd_load.load(ctx, 'ServerHistory', bot)
+    elif action == 'Mine':
+        await cmd_load.load_user_list(ctx, bot)
+    else:
+        await ctx.send(embed = discord.Embed(title="现在就两个功能捏...", description="Please wait...", color=0x00ff00))
+
+@bot.hybrid_command(with_app_command=True, name = 'save', description=dp.save)
+async def saving(ctx, *, url: str): await cmd_load.save_url_user_list(ctx, url)
 
 # 播放音乐之外的功能
 @bot.event
@@ -313,4 +326,4 @@ async def status_set(ctx):
     except:
         await ctx.send(f'You do not have status currently.')
 
-bot.run(os.getenv('TOKEN2'))
+bot.run(os.getenv('TOKEN'))
