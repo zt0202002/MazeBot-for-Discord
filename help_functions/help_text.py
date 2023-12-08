@@ -58,7 +58,7 @@ str_join_channel = discord.Embed(title="我来你的频道啦！快让我康康�
 str_leave = discord.Embed(title=f'我走啦！', description='', color=SUCCESS)
 str_no_song_next = discord.Embed(title=f'接下来我没有要播放的歌了捏！', description='', color=SUCCESS)
 
-str_not_in_voice_channel = discord.Embed(title='你都不在频道！你让我来干嘛！快输入/join让我来你的频道！', description="", color=FAILURE)
+str_not_in_voice_channel = discord.Embed(title='你都不在频道！你让我来干嘛！', description="", color=FAILURE)
 str_not_in_same_channel = discord.Embed(title='我都不在你的频道！你让我来干嘛！快输入/join让我来你的频道！', description="", color=FAILURE)
 str_no_guild_history = discord.Embed(title='好像没有找到历史记录捏', description="", color=FAILURE)
 str_no_netease = discord.Embed(title="目前不支持网易云捏!", description="", color=FAILURE)

@@ -39,6 +39,13 @@ async def play(ctx, bot, input, msg=None):
 
 
 async def check_bot_in_channel(ctx, bot, msg=None):
+    if ctx.author.voice is None:
+        if msg is None:
+            msg = await ctx.send(embed=str_not_in_voice_channel)
+        else:
+            await msg.edit(content='', embed=str_not_in_voice_channel)
+        return None
+    
     voice = get(bot.voice_clients, guild=ctx.guild)
     try:
         channel = ctx.author.voice.channel
@@ -46,7 +53,7 @@ async def check_bot_in_channel(ctx, bot, msg=None):
         channel = ctx.message.channel
     
     if voice is None:
-        msg = await join(ctx, bot)
+        msg = await join(ctx, bot, msg)
         
     elif voice.channel != channel:
         if msg is None:

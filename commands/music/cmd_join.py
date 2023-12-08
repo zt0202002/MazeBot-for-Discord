@@ -5,13 +5,18 @@ from commands.music.music_playlist import player
 
 
 async def join(ctx, bot, msg=None):
-    try: channel = ctx.message.author.voice.channel
-    except: channel = ctx.author.voice.channel
+    try:
+        channel = ctx.message.author.voice.channel
+    except:
+        channel = ctx.author.voice.channel
 
-    if msg is None: msg = await ctx.send(embed=str_loading_bot)
+    if msg is None:
+        msg = await ctx.send(embed=str_loading_bot)
     voice = get(bot.voice_clients, guild=ctx.guild)
-    if voice and voice.is_connected(): await voice.move_to(channel)
-    else:                      voice = await channel.connect()
+    if voice and voice.is_connected():
+        await voice.move_to(channel)
+    else:
+        voice = await channel.connect()
 
     # 防止上次意外退出卡死
     await player.guild_start(ctx.guild.id)
@@ -28,10 +33,14 @@ async def leave(ctx, bot, msg=None):
 
     if voice and voice.is_connected():
         await voice.disconnect()
-        if msg is None: await ctx.send(embed=str_leave)
-        else:           await msg.edit(content='', embed=str_leave)
+        if msg is None:
+            await ctx.send(embed=str_leave)
+        else:
+            await msg.edit(content='', embed=str_leave)
         # await player.clear(ctx.guild.id)
         await player.quit_save(ctx.guild.id)
     else:
-        if msg is None: await ctx.send(embed=str_not_in_voice)
-        else:           await msg.edit(content='', embed=str_not_in_voice)
+        if msg is None:
+            await ctx.send(embed=str_not_in_voice)
+        else:
+            await msg.edit(content='', embed=str_not_in_voice)
