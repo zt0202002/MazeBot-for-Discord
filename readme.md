@@ -20,13 +20,13 @@
 |Discord|MazeCharmZzt#2964|
 
 # Update Note
-### April 12, 2021
+### April 12, 2023
 - 将search功能放入了play这个指令中，现在可以直接用`/play <song_name>`来搜索歌曲了！
 - 增加了各类信息搜索功能,详情请看下方指令列表。
 - 增加了查看splatoon3地图日历的功能，详情请看下方指令列表。
 - **现以支持bilibili playlist的播放！**
 
-### March 31, 2021
+### March 31, 2023
 - 增加了chatgpt功能！现在可以在频道里和bot聊天啦！
 - 在使用`\chatgpt_on`后，支持使用`!<TEXT>`或者`;<TEXT>`和bot在频道中聊天！
 - 在使用`\set_chat_channel <channel>`后，支持直接与bot在设定中的频道聊天！
